@@ -6,7 +6,7 @@ import { buildPrompt, type AIAction } from "@/lib/ai-prompts";
 
 const requestSchema = z.object({
   action: z.enum(["improve-summary", "improve-bullets", "suggest-skills"]),
-  context: z.record(z.unknown()),
+  context: z.record(z.string(), z.unknown()),
 });
 
 export async function POST(request: NextRequest) {
