@@ -1,7 +1,7 @@
 import { Document, Page, Text, View, StyleSheet } from "@react-pdf/renderer";
 import { type CVData } from "@/types/cv";
 import { SECTION_HEADERS } from "@/lib/constants";
-import { formatDate } from "@/lib/utils";
+import { formatDate, formatDateRange } from "@/lib/utils";
 
 const styles = StyleSheet.create({
   page: {
@@ -67,13 +67,6 @@ const styles = StyleSheet.create({
     marginBottom: 1,
   },
 });
-
-function formatDateRange(start: string, end: string, current: boolean): string {
-  const s = formatDate(start);
-  const e = current ? "Atual" : formatDate(end);
-  if (!s && !e) return "";
-  return `${s} – ${e}`;
-}
 
 interface TemplateCompactProps {
   data: CVData;

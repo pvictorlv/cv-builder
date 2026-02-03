@@ -110,7 +110,7 @@ export const cvDataSchema = z.object({
 
 export type CVData = z.infer<typeof cvDataSchema>;
 
-export const templateNameSchema = z.enum(["classic", "modern", "compact"]);
+export const templateNameSchema = z.enum(["classic", "modern", "compact", "elegant", "creative", "executive"]);
 export type TemplateName = z.infer<typeof templateNameSchema>;
 
 export const EMPTY_CV_DATA: CVData = {

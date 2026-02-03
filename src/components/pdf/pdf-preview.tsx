@@ -2,9 +2,7 @@
 
 import dynamic from "next/dynamic";
 import { type CVData, type TemplateName } from "@/types/cv";
-import { TemplateClassic } from "./templates/template-classic";
-import { TemplateModern } from "./templates/template-modern";
-import { TemplateCompact } from "./templates/template-compact";
+import { getTemplateComponent } from "./templates/get-template";
 
 const PDFViewer = dynamic(
   () => import("@react-pdf/renderer").then((mod) => mod.PDFViewer),
@@ -14,18 +12,6 @@ const PDFViewer = dynamic(
 interface PdfPreviewProps {
   data: CVData;
   template: TemplateName;
-}
-
-function getTemplateComponent(template: TemplateName, data: CVData) {
-  switch (template) {
-    case "modern":
-      return <TemplateModern data={data} />;
-    case "compact":
-      return <TemplateCompact data={data} />;
-    case "classic":
-    default:
-      return <TemplateClassic data={data} />;
-  }
 }
 
 export function PdfPreview({ data, template }: PdfPreviewProps) {

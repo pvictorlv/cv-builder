@@ -2,9 +2,7 @@
 
 import dynamic from "next/dynamic";
 import { type CVData, type TemplateName } from "@/types/cv";
-import { TemplateClassic } from "./templates/template-classic";
-import { TemplateModern } from "./templates/template-modern";
-import { TemplateCompact } from "./templates/template-compact";
+import { getTemplateComponent } from "./templates/get-template";
 import { Button } from "@/components/ui/button";
 
 const BlobProvider = dynamic(
@@ -15,18 +13,6 @@ const BlobProvider = dynamic(
 interface PdfDownloadButtonProps {
   data: CVData;
   template: TemplateName;
-}
-
-function getTemplateComponent(template: TemplateName, data: CVData) {
-  switch (template) {
-    case "modern":
-      return <TemplateModern data={data} />;
-    case "compact":
-      return <TemplateCompact data={data} />;
-    case "classic":
-    default:
-      return <TemplateClassic data={data} />;
-  }
 }
 
 function getFileName(name: string): string {

@@ -13,7 +13,7 @@ export function Header({ onOpenAISettings }: HeaderProps) {
         <div className="flex items-center gap-2">
           <h1 className="text-lg font-bold">CV Builder</h1>
           <span className="hidden text-sm text-muted-foreground sm:inline">
-            Currículo otimizado para ATS
+            Currículo otimizado para ATS e recrutadores
           </span>
         </div>
         <Button variant="ghost" size="sm" onClick={onOpenAISettings}>

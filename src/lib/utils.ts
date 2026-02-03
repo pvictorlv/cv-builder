@@ -21,3 +21,10 @@ export function formatDate(dateStr: string): string {
 export function cn(...inputs: ClassValue[]): string {
   return twMerge(clsx(inputs));
 }
+
+export function formatDateRange(start: string, end: string, current: boolean): string {
+  const s = formatDate(start);
+  const e = current ? "Atual" : formatDate(end);
+  if (!s && !e) return "";
+  return `${s} – ${e}`;
+}
