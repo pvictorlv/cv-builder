@@ -6,6 +6,7 @@ interface PromptContext {
   company?: string;
   description?: string;
   currentSkills?: string[];
+  type?: string;
 }
 
 export function buildPrompt(action: AIAction, context: PromptContext): string {
@@ -25,7 +26,28 @@ Regras:
 Resumo atual:
 ${context.summary}`;
 
-    case "improve-bullets":
+    case "improve-bullets": {
+      const typeGuidance: Record<string, string> = {
+        fulltime: `- Comece cada bullet com verbo de ação forte (Desenvolvi, Implementei, Liderei, Otimizei, etc.)
+- Inclua métricas e resultados quando possível (%, números, impacto)
+- Use keywords técnicas relevantes`,
+        freelance: `- Enfatize entregas ao cliente e resultados de negócio
+- Destaque autonomia e gestão independente do projeto
+- Inclua métricas de impacto para o cliente quando possível
+- Use keywords técnicas relevantes`,
+        sideproject: `- Enfatize iniciativa própria e motivação do projeto
+- Destaque decisões técnicas e arquiteturais que você tomou
+- Inclua impacto/alcance do projeto (usuários, downloads, estrelas, etc.)
+- Use keywords técnicas relevantes`,
+        internship: `- Enfatize aprendizado e contribuições para a equipe
+- Destaque crescimento técnico e responsabilidades assumidas
+- Inclua resultados concretos das suas contribuições
+- Use keywords técnicas relevantes`,
+      };
+
+      const type = context.type ?? "fulltime";
+      const rules = typeGuidance[type] ?? typeGuidance.fulltime;
+
       return `Você é um especialista em currículos para vagas de tecnologia no Brasil.
 
 Reescreva os bullet points da experiência abaixo para que sejam mais impactantes e otimizados para ATS.
@@ -34,14 +56,13 @@ Cargo: ${context.role}
 Empresa: ${context.company}
 
 Regras:
-- Comece cada bullet com verbo de ação forte (Desenvolvi, Implementei, Liderei, Otimizei, etc.)
-- Inclua métricas e resultados quando possível (%, números, impacto)
-- Use keywords técnicas relevantes
+${rules}
 - Um bullet por linha, sem marcadores
 - Responda APENAS com os bullets, um por linha, sem explicações
 
 Bullets atuais:
 ${context.description}`;
+    }
 
     case "suggest-skills":
       return `Você é um especialista em currículos para vagas de tecnologia no Brasil.

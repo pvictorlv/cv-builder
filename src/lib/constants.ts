@@ -13,5 +13,19 @@ export const SECTION_HEADERS = {
   languages: "IDIOMAS",
 } as const;
 
-export const AI_MODEL = "deepseek/deepseek-chat";
+export const WORK_TYPE_LABELS: Record<string, string> = {
+  fulltime: "Tempo integral",
+  freelance: "Freelance",
+  sideproject: "Projeto pessoal",
+  internship: "Estágio",
+};
+
+export const WORK_TYPE_FIELD_LABELS: Record<string, { company: string; companyPlaceholder: string }> = {
+  fulltime: { company: "Empresa", companyPlaceholder: "Tech Corp" },
+  freelance: { company: "Cliente", companyPlaceholder: "Nome do cliente" },
+  sideproject: { company: "Projeto", companyPlaceholder: "Nome do projeto" },
+  internship: { company: "Empresa", companyPlaceholder: "Tech Corp" },
+};
+
+export const AI_MODEL = "deepseek/deepseek-v3.2-speciale";
 export const OPENROUTER_BASE_URL = "https://openrouter.ai/api/v1";

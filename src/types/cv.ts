@@ -18,8 +18,17 @@ export const professionalSummarySchema = z.object({
 
 export type ProfessionalSummary = z.infer<typeof professionalSummarySchema>;
 
+export const workExperienceTypeSchema = z.enum([
+  "fulltime",
+  "freelance",
+  "sideproject",
+  "internship",
+]);
+export type WorkExperienceType = z.infer<typeof workExperienceTypeSchema>;
+
 export const workExperienceItemSchema = z.object({
   id: z.string(),
+  type: workExperienceTypeSchema.default("fulltime"),
   role: z.string(),
   company: z.string(),
   startDate: z.string(),

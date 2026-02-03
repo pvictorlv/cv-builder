@@ -1,7 +1,7 @@
 import { Document, Page, Text, View, StyleSheet } from "@react-pdf/renderer";
 import { type CVData } from "@/types/cv";
 import { SECTION_HEADERS } from "@/lib/constants";
-import { formatDate, formatDateRange } from "@/lib/utils";
+import { formatDate, formatDateRange, formatCompanyWithType } from "@/lib/utils";
 
 const styles = StyleSheet.create({
   page: {
@@ -104,7 +104,10 @@ export function TemplateCompact({ data }: TemplateCompactProps) {
                 <View style={styles.itemHeader}>
                   <Text style={styles.bold}>
                     {item.role}
-                    {item.company ? ` – ${item.company}` : ""}
+                    {(() => {
+                      const formatted = formatCompanyWithType(item.company, item.type ?? "fulltime");
+                      return formatted ? ` – ${formatted}` : "";
+                    })()}
                   </Text>
                   <Text style={styles.italic}>
                     {formatDateRange(item.startDate, item.endDate, item.current)}

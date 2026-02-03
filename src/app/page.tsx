@@ -104,9 +104,10 @@ export default function Home() {
                       role: item.role,
                       company: item.company,
                       description: item.description,
+                      type: item.type,
                     }}
                     onAccept={(result) => form.updateWork(itemId, { description: result })}
-                    label="Melhorar bullets"
+                    label="Melhorar com IA"
                   />
                 );
               }}

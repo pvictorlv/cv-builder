@@ -1,7 +1,7 @@
 import { Document, Page, Text, View, StyleSheet } from "@react-pdf/renderer";
 import { type CVData } from "@/types/cv";
 import { SECTION_HEADERS } from "@/lib/constants";
-import { formatDate, formatDateRange } from "@/lib/utils";
+import { formatDate, formatDateRange, formatCompanyWithType } from "@/lib/utils";
 
 const styles = StyleSheet.create({
   page: {
@@ -113,8 +113,8 @@ export function TemplateClassic({ data }: TemplateClassicProps) {
                     {formatDateRange(item.startDate, item.endDate, item.current)}
                   </Text>
                 </View>
-                {item.company && (
-                  <Text style={styles.italic}>{item.company}</Text>
+                {(item.company || (item.type && item.type !== "fulltime")) && (
+                  <Text style={styles.italic}>{formatCompanyWithType(item.company, item.type ?? "fulltime")}</Text>
                 )}
                 {item.description &&
                   item.description.split("\n").filter(Boolean).map((line, i) => (
