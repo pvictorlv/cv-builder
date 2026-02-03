@@ -1,10 +1,9 @@
 "use client";
 
+import { memo } from "react";
 import dynamic from "next/dynamic";
 import { type CVData, type TemplateName } from "@/types/cv";
-import { TemplateClassic } from "./templates/template-classic";
-import { TemplateModern } from "./templates/template-modern";
-import { TemplateCompact } from "./templates/template-compact";
+import { getTemplateComponent } from "./templates/get-template";
 import { Button } from "@/components/ui/button";
 
 const BlobProvider = dynamic(
@@ -17,18 +16,6 @@ interface PdfDownloadButtonProps {
   template: TemplateName;
 }
 
-function getTemplateComponent(template: TemplateName, data: CVData) {
-  switch (template) {
-    case "modern":
-      return <TemplateModern data={data} />;
-    case "compact":
-      return <TemplateCompact data={data} />;
-    case "classic":
-    default:
-      return <TemplateClassic data={data} />;
-  }
-}
-
 function getFileName(name: string): string {
   const slug = name
     .toLowerCase()
@@ -39,7 +26,7 @@ function getFileName(name: string): string {
   return slug ? `cv-${slug}.pdf` : "cv.pdf";
 }
 
-export function PdfDownloadButton({ data, template }: PdfDownloadButtonProps) {
+export const PdfDownloadButton = memo(function PdfDownloadButton({ data, template }: PdfDownloadButtonProps) {
   return (
     <BlobProvider document={getTemplateComponent(template, data)}>
       {({ url, loading }) => (
@@ -60,4 +47,4 @@ export function PdfDownloadButton({ data, template }: PdfDownloadButtonProps) {
       )}
     </BlobProvider>
   );
-}
+});

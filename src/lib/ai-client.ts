@@ -1,4 +1,5 @@
 import { type AIAction } from "./ai-prompts";
+import { type AISettings } from "./storage";
 
 interface AIRequest {
   action: AIAction;
@@ -12,12 +13,16 @@ interface AIResponse {
 export async function fetchAISuggestion(
   request: AIRequest,
   apiKey: string,
+  settings: AISettings,
 ): Promise<string> {
   const response = await fetch("/api/ai", {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
       "X-OpenRouter-Key": apiKey,
+      "X-AI-Model": settings.model,
+      "X-AI-Temperature": String(settings.temperature),
+      "X-AI-Max-Tokens": String(settings.maxTokens),
     },
     body: JSON.stringify(request),
   });

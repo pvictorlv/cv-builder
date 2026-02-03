@@ -1,12 +1,16 @@
 import { z } from "zod";
 
+export const professionalAreaSchema = z.enum(["tech", "support", "hr"]);
+export type ProfessionalArea = z.infer<typeof professionalAreaSchema>;
+
 export const contactInfoSchema = z.object({
   name: z.string().min(1, "Nome é obrigatório"),
   email: z.string().email("Email inválido").or(z.literal("")),
   phone: z.string(),
   location: z.string(),
-  linkedin: z.string().url("URL inválida").or(z.literal("")),
-  portfolio: z.string().url("URL inválida").or(z.literal("")),
+  linkedin: z.string(),
+  portfolio: z.string(),
+  photoUrl: z.string(),
 });
 
 export type ContactInfo = z.infer<typeof contactInfoSchema>;
@@ -17,8 +21,17 @@ export const professionalSummarySchema = z.object({
 
 export type ProfessionalSummary = z.infer<typeof professionalSummarySchema>;
 
+export const workExperienceTypeSchema = z.enum([
+  "fulltime",
+  "freelance",
+  "sideproject",
+  "internship",
+]);
+export type WorkExperienceType = z.infer<typeof workExperienceTypeSchema>;
+
 export const workExperienceItemSchema = z.object({
   id: z.string(),
+  type: workExperienceTypeSchema.default("fulltime"),
   role: z.string(),
   company: z.string(),
   startDate: z.string(),
@@ -99,6 +112,7 @@ export const languagesSchema = z.object({
 export type Languages = z.infer<typeof languagesSchema>;
 
 export const cvDataSchema = z.object({
+  professionalArea: professionalAreaSchema.default("tech"),
   contactInfo: contactInfoSchema,
   professionalSummary: professionalSummarySchema,
   workExperience: workExperienceSchema,
@@ -110,10 +124,11 @@ export const cvDataSchema = z.object({
 
 export type CVData = z.infer<typeof cvDataSchema>;
 
-export const templateNameSchema = z.enum(["classic", "modern", "compact"]);
+export const templateNameSchema = z.enum(["classic", "modern", "compact", "elegant", "creative", "executive"]);
 export type TemplateName = z.infer<typeof templateNameSchema>;
 
 export const EMPTY_CV_DATA: CVData = {
+  professionalArea: "tech",
   contactInfo: {
     name: "",
     email: "",
@@ -121,6 +136,7 @@ export const EMPTY_CV_DATA: CVData = {
     location: "",
     linkedin: "",
     portfolio: "",
+    photoUrl: "",
   },
   professionalSummary: {
     summary: "",

@@ -1,6 +1,7 @@
 import { v4 as uuidv4 } from "uuid";
 import { type ClassValue, clsx } from "clsx";
 import { twMerge } from "tailwind-merge";
+import { WORK_TYPE_LABELS } from "@/lib/constants";
 
 export function generateId(): string {
   return uuidv4();
@@ -20,4 +21,18 @@ export function formatDate(dateStr: string): string {
 
 export function cn(...inputs: ClassValue[]): string {
   return twMerge(clsx(inputs));
+}
+
+export function formatDateRange(start: string, end: string, current: boolean): string {
+  const s = formatDate(start);
+  const e = current ? "Atual" : formatDate(end);
+  if (!s && !e) return "";
+  return `${s} – ${e}`;
+}
+
+export function formatCompanyWithType(company: string, type: string): string {
+  if (type === "fulltime") return company;
+  const label = WORK_TYPE_LABELS[type];
+  if (!label) return company;
+  return company ? `${company} · ${label}` : label;
 }

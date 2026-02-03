@@ -5,6 +5,7 @@ import {
   type CVData,
   type ContactInfo,
   type ProfessionalSummary,
+  type ProfessionalArea,
   type WorkExperienceItem,
   type EducationItem,
   type CertificationItem,
@@ -14,15 +15,18 @@ import {
 
 type Action =
   | { type: "SET_ALL"; payload: CVData }
+  | { type: "SET_PROFESSIONAL_AREA"; payload: ProfessionalArea }
   | { type: "SET_CONTACT"; payload: Partial<ContactInfo> }
   | { type: "SET_SUMMARY"; payload: string }
   | { type: "ADD_WORK"; payload: WorkExperienceItem }
   | { type: "UPDATE_WORK"; payload: { id: string; data: Partial<WorkExperienceItem> } }
   | { type: "REMOVE_WORK"; payload: string }
+  | { type: "REORDER_WORK"; payload: { fromIndex: number; toIndex: number } }
   | { type: "ADD_EDUCATION"; payload: EducationItem }
   | { type: "UPDATE_EDUCATION"; payload: { id: string; data: Partial<EducationItem> } }
   | { type: "REMOVE_EDUCATION"; payload: string }
   | { type: "SET_SKILLS"; payload: string[] }
+  | { type: "REORDER_SKILLS"; payload: { fromIndex: number; toIndex: number } }
   | { type: "ADD_CERTIFICATION"; payload: CertificationItem }
   | { type: "UPDATE_CERTIFICATION"; payload: { id: string; data: Partial<CertificationItem> } }
   | { type: "REMOVE_CERTIFICATION"; payload: string }
@@ -34,6 +38,12 @@ function cvReducer(state: CVData, action: Action): CVData {
   switch (action.type) {
     case "SET_ALL":
       return action.payload;
+
+    case "SET_PROFESSIONAL_AREA":
+      return {
+        ...state,
+        professionalArea: action.payload,
+      };
 
     case "SET_CONTACT":
       return {
@@ -51,7 +61,7 @@ function cvReducer(state: CVData, action: Action): CVData {
       return {
         ...state,
         workExperience: {
-          items: [...state.workExperience.items, action.payload],
+          items: [action.payload, ...state.workExperience.items],
         },
       };
 
@@ -74,6 +84,17 @@ function cvReducer(state: CVData, action: Action): CVData {
           items: state.workExperience.items.filter((item) => item.id !== action.payload),
         },
       };
+
+    case "REORDER_WORK": {
+      const { fromIndex, toIndex } = action.payload;
+      const items = [...state.workExperience.items];
+      const [moved] = items.splice(fromIndex, 1);
+      items.splice(toIndex, 0, moved);
+      return {
+        ...state,
+        workExperience: { items },
+      };
+    }
 
     case "ADD_EDUCATION":
       return {
@@ -108,6 +129,17 @@ function cvReducer(state: CVData, action: Action): CVData {
         ...state,
         skills: { items: action.payload },
       };
+
+    case "REORDER_SKILLS": {
+      const { fromIndex, toIndex } = action.payload;
+      const items = [...state.skills.items];
+      const [moved] = items.splice(fromIndex, 1);
+      items.splice(toIndex, 0, moved);
+      return {
+        ...state,
+        skills: { items },
+      };
+    }
 
     case "ADD_CERTIFICATION":
       return {
@@ -177,6 +209,10 @@ export function useCvForm(initialData: CVData = EMPTY_CV_DATA) {
     dispatch({ type: "SET_ALL", payload: data });
   }, []);
 
+  const setProfessionalArea = useCallback((area: ProfessionalArea) => {
+    dispatch({ type: "SET_PROFESSIONAL_AREA", payload: area });
+  }, []);
+
   const setContact = useCallback((data: Partial<ContactInfo>) => {
     dispatch({ type: "SET_CONTACT", payload: data });
   }, []);
@@ -197,6 +233,10 @@ export function useCvForm(initialData: CVData = EMPTY_CV_DATA) {
     dispatch({ type: "REMOVE_WORK", payload: id });
   }, []);
 
+  const reorderWork = useCallback((fromIndex: number, toIndex: number) => {
+    dispatch({ type: "REORDER_WORK", payload: { fromIndex, toIndex } });
+  }, []);
+
   const addEducation = useCallback((item: EducationItem) => {
     dispatch({ type: "ADD_EDUCATION", payload: item });
   }, []);
@@ -211,6 +251,10 @@ export function useCvForm(initialData: CVData = EMPTY_CV_DATA) {
 
   const setSkills = useCallback((items: string[]) => {
     dispatch({ type: "SET_SKILLS", payload: items });
+  }, []);
+
+  const reorderSkills = useCallback((fromIndex: number, toIndex: number) => {
+    dispatch({ type: "REORDER_SKILLS", payload: { fromIndex, toIndex } });
   }, []);
 
   const addCertification = useCallback((item: CertificationItem) => {
@@ -240,15 +284,18 @@ export function useCvForm(initialData: CVData = EMPTY_CV_DATA) {
   return {
     cvData,
     setAll,
+    setProfessionalArea,
     setContact,
     setSummary,
     addWork,
     updateWork,
     removeWork,
+    reorderWork,
     addEducation,
     updateEducation,
     removeEducation,
     setSkills,
+    reorderSkills,
     addCertification,
     updateCertification,
     removeCertification,
