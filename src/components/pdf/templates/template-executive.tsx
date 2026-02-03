@@ -1,4 +1,4 @@
-import { Document, Page, Text, View, StyleSheet } from "@react-pdf/renderer";
+import { Document, Page, Text, View, Image, StyleSheet } from "@react-pdf/renderer";
 import { type CVData } from "@/types/cv";
 import { SECTION_HEADERS } from "@/lib/constants";
 import { formatDate, formatDateRange } from "@/lib/utils";
@@ -128,23 +128,38 @@ export function TemplateExecutive({ data }: TemplateExecutiveProps) {
         {/* Content */}
         <View style={styles.content}>
           {/* Header */}
-          {contactInfo.name && (
-            <Text style={styles.name}>{contactInfo.name}</Text>
-          )}
-          {contactParts.length > 0 && (
-            <View style={styles.contactRow}>
-              {contactParts.map((part, i) => (
-                <Text key={i} style={styles.contactItem}>{part}</Text>
-              ))}
+          <View style={contactInfo.photoUrl ? { flexDirection: "row", justifyContent: "space-between", alignItems: "flex-start" } : {}}>
+            <View style={contactInfo.photoUrl ? { flex: 1 } : {}}>
+              {contactInfo.name && (
+                <Text style={styles.name}>{contactInfo.name}</Text>
+              )}
+              {contactParts.length > 0 && (
+                <View style={styles.contactRow}>
+                  {contactParts.map((part, i) => (
+                    <Text key={i} style={styles.contactItem}>{part}</Text>
+                  ))}
+                </View>
+              )}
+              {linkParts.length > 0 && (
+                <View style={styles.contactRow}>
+                  {linkParts.map((part, i) => (
+                    <Text key={i} style={styles.contactItem}>{part}</Text>
+                  ))}
+                </View>
+              )}
             </View>
-          )}
-          {linkParts.length > 0 && (
-            <View style={styles.contactRow}>
-              {linkParts.map((part, i) => (
-                <Text key={i} style={styles.contactItem}>{part}</Text>
-              ))}
-            </View>
-          )}
+            {contactInfo.photoUrl && (
+              <Image
+                src={contactInfo.photoUrl}
+                style={{
+                  width: 48,
+                  height: 48,
+                  borderRadius: 24,
+                  marginLeft: 12,
+                }}
+              />
+            )}
+          </View>
 
           {/* Summary */}
           {professionalSummary.summary && (

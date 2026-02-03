@@ -1,4 +1,4 @@
-import { Document, Page, Text, View, StyleSheet } from "@react-pdf/renderer";
+import { Document, Page, Text, View, Image, StyleSheet } from "@react-pdf/renderer";
 import { type CVData } from "@/types/cv";
 import { SECTION_HEADERS } from "@/lib/constants";
 import { formatDate, formatDateRange } from "@/lib/utils";
@@ -121,6 +121,18 @@ export function TemplateElegant({ data }: TemplateElegantProps) {
       <Page size="A4" style={styles.page}>
         {/* Sidebar */}
         <View style={styles.sidebar}>
+          {contactInfo.photoUrl && (
+            <Image
+              src={contactInfo.photoUrl}
+              style={{
+                width: 64,
+                height: 64,
+                borderRadius: 32,
+                marginBottom: 10,
+                alignSelf: "center",
+              }}
+            />
+          )}
           {contactInfo.name && (
             <Text style={styles.sidebarName}>{contactInfo.name}</Text>
           )}

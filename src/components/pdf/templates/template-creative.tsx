@@ -1,4 +1,4 @@
-import { Document, Page, Text, View, StyleSheet } from "@react-pdf/renderer";
+import { Document, Page, Text, View, Image, StyleSheet } from "@react-pdf/renderer";
 import { type CVData } from "@/types/cv";
 import { SECTION_HEADERS } from "@/lib/constants";
 import { formatDate, formatDateRange } from "@/lib/utils";
@@ -116,17 +116,29 @@ export function TemplateCreative({ data }: TemplateCreativeProps) {
     <Document>
       <Page size="A4" style={styles.page}>
         {/* Header */}
-        <View style={styles.header}>
-          {contactInfo.name && (
-            <Text style={styles.headerName}>{contactInfo.name}</Text>
+        <View style={[styles.header, contactInfo.photoUrl ? { flexDirection: "row", alignItems: "center", gap: 16 } : {}]}>
+          {contactInfo.photoUrl && (
+            <Image
+              src={contactInfo.photoUrl}
+              style={{
+                width: 56,
+                height: 56,
+                borderRadius: 28,
+              }}
+            />
           )}
-          {contactParts.length > 0 && (
-            <View style={styles.headerContactRow}>
-              {contactParts.map((part, i) => (
-                <Text key={i} style={styles.headerContactItem}>{part}</Text>
-              ))}
-            </View>
-          )}
+          <View style={contactInfo.photoUrl ? { flex: 1 } : {}}>
+            {contactInfo.name && (
+              <Text style={styles.headerName}>{contactInfo.name}</Text>
+            )}
+            {contactParts.length > 0 && (
+              <View style={styles.headerContactRow}>
+                {contactParts.map((part, i) => (
+                  <Text key={i} style={styles.headerContactItem}>{part}</Text>
+                ))}
+              </View>
+            )}
+          </View>
         </View>
 
         {/* Body */}

@@ -7,6 +7,7 @@ export const contactInfoSchema = z.object({
   location: z.string(),
   linkedin: z.string().url("URL inválida").or(z.literal("")),
   portfolio: z.string().url("URL inválida").or(z.literal("")),
+  photoUrl: z.string(),
 });
 
 export type ContactInfo = z.infer<typeof contactInfoSchema>;
@@ -121,6 +122,7 @@ export const EMPTY_CV_DATA: CVData = {
     location: "",
     linkedin: "",
     portfolio: "",
+    photoUrl: "",
   },
   professionalSummary: {
     summary: "",
