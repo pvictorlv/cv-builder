@@ -8,8 +8,8 @@ Construtor de currículos em PDF otimizados para plataformas de recrutamento, li
 - Preview do PDF em tempo real enquanto você edita
 - 6 templates diferentes (Classic, Modern, Elegant, Executive, Creative, Compact)
 - Sugestões de IA para melhorar textos (resumo profissional, descrição de experiências, skills)
-- Salva automaticamente no navegador
-
+- Suporte a área Tecnologia, Recursos Humanos e Suporte Técnico
+- Salvamento automático no localStorage do navegador
 
 ## Requisitos
 
