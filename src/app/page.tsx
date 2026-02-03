@@ -5,6 +5,7 @@ import { type TemplateName } from "@/types/cv";
 import { loadCVData, loadTemplate, saveTemplate } from "@/lib/storage";
 import { useCvForm } from "@/hooks/use-cv-form";
 import { useAutosave } from "@/hooks/use-autosave";
+import { useDebouncedValue } from "@/hooks/use-debounced-value";
 import { CvEditor } from "@/components/cv-form/cv-editor";
 import { PdfPreview } from "@/components/pdf/pdf-preview";
 import { PdfDownloadButton } from "@/components/pdf/pdf-download-button";
@@ -31,6 +32,8 @@ export default function Home() {
   }, []);
 
   useAutosave(form.cvData);
+
+  const debouncedCvData = useDebouncedValue(form.cvData, 500);
 
   function handleTemplateChange(t: TemplateName) {
     setTemplate(t);
@@ -119,10 +122,10 @@ export default function Home() {
           <div className="flex flex-col gap-3 lg:w-[600px] lg:shrink-0">
             <div className="flex items-center justify-between gap-2">
               <TemplateSelector value={template} onChange={handleTemplateChange} />
-              <PdfDownloadButton data={form.cvData} template={template} />
+              <PdfDownloadButton data={debouncedCvData} template={template} />
             </div>
             <div className="h-[700px] overflow-hidden rounded-lg border border-border bg-white lg:h-[calc(100vh-11rem)]">
-              <PdfPreview data={form.cvData} template={template} />
+              <PdfPreview data={debouncedCvData} template={template} />
             </div>
           </div>
         </main>

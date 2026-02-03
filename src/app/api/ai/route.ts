@@ -1,7 +1,7 @@
 import { NextResponse, type NextRequest } from "next/server";
 import { z } from "zod";
 import OpenAI from "openai";
-import { AI_MODEL, OPENROUTER_BASE_URL } from "@/lib/constants";
+import { AI_DEFAULTS, OPENROUTER_BASE_URL } from "@/lib/constants";
 import { buildPrompt, type AIAction } from "@/lib/ai-prompts";
 
 const requestSchema = z.object({
@@ -28,6 +28,10 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    const model = request.headers.get("X-AI-Model") || AI_DEFAULTS.model;
+    const temperature = Number(request.headers.get("X-AI-Temperature")) || AI_DEFAULTS.temperature;
+    const maxTokens = Number(request.headers.get("X-AI-Max-Tokens")) || AI_DEFAULTS.maxTokens;
+
     const { action, context } = parsed.data;
     const prompt = buildPrompt(action as AIAction, context as Record<string, string | string[]>);
 
@@ -37,10 +41,10 @@ export async function POST(request: NextRequest) {
     });
 
     const completion = await openai.chat.completions.create({
-      model: AI_MODEL,
+      model,
       messages: [{ role: "user", content: prompt }],
-      max_tokens: 1000,
-      temperature: 0.7,
+      max_tokens: maxTokens,
+      temperature,
     });
 
     const result = completion.choices[0]?.message?.content?.trim() ?? "";

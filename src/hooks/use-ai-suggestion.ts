@@ -3,7 +3,7 @@
 import { useState, useCallback } from "react";
 import { fetchAISuggestion } from "@/lib/ai-client";
 import { type AIAction } from "@/lib/ai-prompts";
-import { loadAIApiKey } from "@/lib/storage";
+import { loadAIApiKey, loadAISettings } from "@/lib/storage";
 
 interface UseAISuggestionReturn {
   loading: boolean;
@@ -27,7 +27,8 @@ export function useAISuggestion(): UseAISuggestionReturn {
       setError(null);
 
       try {
-        const result = await fetchAISuggestion({ action, context }, apiKey);
+        const settings = loadAISettings();
+        const result = await fetchAISuggestion({ action, context }, apiKey, settings);
         return result;
       } catch (err) {
         const message = err instanceof Error ? err.message : "Erro ao buscar sugestão";

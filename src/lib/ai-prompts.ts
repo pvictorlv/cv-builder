@@ -12,16 +12,22 @@ interface PromptContext {
 export function buildPrompt(action: AIAction, context: PromptContext): string {
   switch (action) {
     case "improve-summary":
-      return `Você é um especialista em currículos para vagas de tecnologia no Brasil.
+      return `Você é um especialista em currículos para vagas de tecnologia no Brasil, com foco em alto desempenho em sistemas ATS (Gupy, Kenoby, Greenhouse).
 
-Reescreva o resumo profissional abaixo para que seja mais impactante e otimizado para sistemas ATS (Gupy, Kenoby).
+Reescreva o resumo profissional abaixo para torná-lo claro, objetivo e orientado a impacto profissional.
+
+Objetivo:
+Gerar um resumo escaneável por ATS e atrativo para recrutadores técnicos.
 
 Regras:
-- Use verbos de ação no início das frases
-- Inclua keywords relevantes para a área de tecnologia
+- Use verbos de ação e linguagem profissional
+- Priorize experiência, tecnologias, responsabilidades e impacto
+- Inclua keywords relevantes da área de tecnologia
+- Evite termos vagos como "apaixonado", "proativo", "busco desafios"
 - Mantenha em primeira pessoa implícita (sem "eu")
-- Máximo 500 caracteres
-- Responda APENAS com o texto do resumo, sem explicações
+- Máximo de 500 caracteres
+- Texto em parágrafo único
+- Responda APENAS com o texto final do resumo, sem comentários ou explicações
 
 Resumo atual:
 ${context.summary}`;
@@ -29,8 +35,9 @@ ${context.summary}`;
     case "improve-bullets": {
       const typeGuidance: Record<string, string> = {
         fulltime: `- Comece cada bullet com verbo de ação forte (Desenvolvi, Implementei, Liderei, Otimizei, etc.)
-- Inclua métricas e resultados quando possível (%, números, impacto)
-- Use keywords técnicas relevantes`,
+- Inclua métricas e resultados quando possível (%, números, volume, impacto)
+- Use keywords técnicas explícitas (linguagens, frameworks, bancos, cloud, metodologias)
+- Evite frases genéricas ou descritivas demais`,
         freelance: `- Enfatize entregas ao cliente e resultados de negócio
 - Destaque autonomia e gestão independente do projeto
 - Inclua métricas de impacto para o cliente quando possível
