@@ -1,5 +1,8 @@
 import { z } from "zod";
 
+export const professionalAreaSchema = z.enum(["tech", "support", "hr"]);
+export type ProfessionalArea = z.infer<typeof professionalAreaSchema>;
+
 export const contactInfoSchema = z.object({
   name: z.string().min(1, "Nome é obrigatório"),
   email: z.string().email("Email inválido").or(z.literal("")),
@@ -109,6 +112,7 @@ export const languagesSchema = z.object({
 export type Languages = z.infer<typeof languagesSchema>;
 
 export const cvDataSchema = z.object({
+  professionalArea: professionalAreaSchema.default("tech"),
   contactInfo: contactInfoSchema,
   professionalSummary: professionalSummarySchema,
   workExperience: workExperienceSchema,
@@ -124,6 +128,7 @@ export const templateNameSchema = z.enum(["classic", "modern", "compact", "elega
 export type TemplateName = z.infer<typeof templateNameSchema>;
 
 export const EMPTY_CV_DATA: CVData = {
+  professionalArea: "tech",
   contactInfo: {
     name: "",
     email: "",

@@ -59,6 +59,7 @@ export default function Home() {
           <div className="flex-1 overflow-y-auto lg:max-h-[calc(100vh-8rem)]">
             <CvEditor
               cvData={form.cvData}
+              onProfessionalAreaChange={form.setProfessionalArea}
               onContactChange={form.setContact}
               onSummaryChange={form.setSummary}
               onAddWork={form.addWork}
@@ -93,6 +94,7 @@ export default function Home() {
                     action="improve-summary"
                     context={{
                       summary: form.cvData.professionalSummary.summary,
+                      professionalArea: form.cvData.professionalArea,
                       ...(useExperienceForSummary && {
                         workExperience: form.cvData.workExperience.items.map(
                           ({ role, company, description }) => ({ role, company, description }),
@@ -107,7 +109,10 @@ export default function Home() {
               skillsAiButton={
                 <AISuggestionButton
                   action="suggest-skills"
-                  context={{ currentSkills: form.cvData.skills.items }}
+                  context={{
+                    currentSkills: form.cvData.skills.items,
+                    professionalArea: form.cvData.professionalArea,
+                  }}
                   onAccept={(result) => {
                     const newSkills = result
                       .split("\n")
@@ -131,6 +136,7 @@ export default function Home() {
                       company: item.company,
                       description: item.description,
                       type: item.type,
+                      professionalArea: form.cvData.professionalArea,
                     }}
                     onAccept={(result) => form.updateWork(itemId, { description: result })}
                     label="Melhorar com IA"

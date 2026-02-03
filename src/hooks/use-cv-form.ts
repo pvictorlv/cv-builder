@@ -5,6 +5,7 @@ import {
   type CVData,
   type ContactInfo,
   type ProfessionalSummary,
+  type ProfessionalArea,
   type WorkExperienceItem,
   type EducationItem,
   type CertificationItem,
@@ -14,6 +15,7 @@ import {
 
 type Action =
   | { type: "SET_ALL"; payload: CVData }
+  | { type: "SET_PROFESSIONAL_AREA"; payload: ProfessionalArea }
   | { type: "SET_CONTACT"; payload: Partial<ContactInfo> }
   | { type: "SET_SUMMARY"; payload: string }
   | { type: "ADD_WORK"; payload: WorkExperienceItem }
@@ -36,6 +38,12 @@ function cvReducer(state: CVData, action: Action): CVData {
   switch (action.type) {
     case "SET_ALL":
       return action.payload;
+
+    case "SET_PROFESSIONAL_AREA":
+      return {
+        ...state,
+        professionalArea: action.payload,
+      };
 
     case "SET_CONTACT":
       return {
@@ -201,6 +209,10 @@ export function useCvForm(initialData: CVData = EMPTY_CV_DATA) {
     dispatch({ type: "SET_ALL", payload: data });
   }, []);
 
+  const setProfessionalArea = useCallback((area: ProfessionalArea) => {
+    dispatch({ type: "SET_PROFESSIONAL_AREA", payload: area });
+  }, []);
+
   const setContact = useCallback((data: Partial<ContactInfo>) => {
     dispatch({ type: "SET_CONTACT", payload: data });
   }, []);
@@ -272,6 +284,7 @@ export function useCvForm(initialData: CVData = EMPTY_CV_DATA) {
   return {
     cvData,
     setAll,
+    setProfessionalArea,
     setContact,
     setSummary,
     addWork,

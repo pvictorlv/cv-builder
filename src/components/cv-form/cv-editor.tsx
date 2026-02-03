@@ -1,7 +1,10 @@
 "use client";
 
 import { type ReactNode } from "react";
-import { type CVData, type WorkExperienceItem, type EducationItem, type CertificationItem, type LanguageItem, type ContactInfo } from "@/types/cv";
+import { type CVData, type ProfessionalArea, type WorkExperienceItem, type EducationItem, type CertificationItem, type LanguageItem, type ContactInfo } from "@/types/cv";
+import { PROFESSIONAL_AREAS } from "@/lib/constants";
+import { Select } from "@/components/ui/select";
+import { SectionCard } from "@/components/ui/section-card";
 import { ContactInfoForm } from "./contact-info-form";
 import { ProfessionalSummaryForm } from "./professional-summary-form";
 import { WorkExperienceForm } from "./work-experience-form";
@@ -10,8 +13,14 @@ import { SkillsForm } from "./skills-form";
 import { CertificationsForm } from "./certifications-form";
 import { LanguagesForm } from "./languages-form";
 
+const professionalAreaOptions = Object.entries(PROFESSIONAL_AREAS).map(([value, label]) => ({
+  value,
+  label,
+}));
+
 interface CvEditorProps {
   cvData: CVData;
+  onProfessionalAreaChange: (area: ProfessionalArea) => void;
   onContactChange: (data: Partial<ContactInfo>) => void;
   onSummaryChange: (summary: string) => void;
   onAddWork: (item: WorkExperienceItem) => void;
@@ -36,6 +45,7 @@ interface CvEditorProps {
 
 export function CvEditor({
   cvData,
+  onProfessionalAreaChange,
   onContactChange,
   onSummaryChange,
   onAddWork,
@@ -59,6 +69,18 @@ export function CvEditor({
 }: CvEditorProps) {
   return (
     <div className="space-y-4">
+      <SectionCard title="Área Profissional">
+        <Select
+          id="professionalArea"
+          label="Selecione sua área de atuação"
+          options={professionalAreaOptions}
+          value={cvData.professionalArea}
+          onChange={(e) => onProfessionalAreaChange(e.target.value as ProfessionalArea)}
+        />
+        <p className="mt-2 text-xs text-muted-foreground">
+          A área selecionada influencia as sugestões de IA para resumo, experiências e habilidades.
+        </p>
+      </SectionCard>
       <ContactInfoForm data={cvData.contactInfo} onChange={onContactChange} />
       <ProfessionalSummaryForm
         summary={cvData.professionalSummary.summary}

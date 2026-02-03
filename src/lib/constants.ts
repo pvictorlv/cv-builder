@@ -35,3 +35,11 @@ export const AI_DEFAULTS: { model: string; temperature: number; maxTokens: numbe
 };
 
 export const OPENROUTER_BASE_URL = "https://openrouter.ai/api/v1";
+
+export const PROFESSIONAL_AREAS = {
+  tech: "Tecnologia / Desenvolvimento",
+  support: "Suporte / Atendimento ao Cliente",
+  hr: "Recursos Humanos",
+} as const;
+
+export type ProfessionalArea = keyof typeof PROFESSIONAL_AREAS;
