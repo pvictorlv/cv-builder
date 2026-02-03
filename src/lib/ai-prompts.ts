@@ -7,6 +7,7 @@ interface PromptContext {
   description?: string;
   currentSkills?: string[];
   type?: string;
+  workExperience?: { role: string; company: string; description: string }[];
 }
 
 export function buildPrompt(action: AIAction, context: PromptContext): string {
@@ -34,7 +35,17 @@ Regras:
 - Responda APENAS com o texto do resumo, sem aspas, comentários ou explicações
 
 Resumo atual:
-${context.summary}`;
+${context.summary || "(vazio)"}${
+        context.workExperience?.length
+          ? `
+
+Experiências profissionais do candidato (use como base para extrair competências, tecnologias, resultados e contexto profissional):
+${context.workExperience.map((exp) => `- ${exp.role} na ${exp.company}: ${exp.description}`).join("\n")}` +
+            (!context.summary
+              ? "\n\nO resumo atual está vazio. Gere um resumo profissional do zero com base nas experiências acima."
+              : "")
+          : ""
+      }`;
 
     case "improve-bullets": {
       const typeGuidance: Record<string, string> = {

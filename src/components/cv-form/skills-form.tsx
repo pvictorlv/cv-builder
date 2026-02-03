@@ -8,10 +8,11 @@ import { SectionCard } from "@/components/ui/section-card";
 interface SkillsFormProps {
   skills: string[];
   onChange: (skills: string[]) => void;
+  onReorder: (fromIndex: number, toIndex: number) => void;
   aiButton?: ReactNode;
 }
 
-export function SkillsForm({ skills, onChange, aiButton }: SkillsFormProps) {
+export function SkillsForm({ skills, onChange, onReorder, aiButton }: SkillsFormProps) {
   const [input, setInput] = useState("");
 
   function addSkill() {
@@ -49,12 +50,30 @@ export function SkillsForm({ skills, onChange, aiButton }: SkillsFormProps) {
       </div>
       {skills.length > 0 && (
         <div className="mt-3 flex flex-wrap gap-2">
-          {skills.map((skill) => (
+          {skills.map((skill, index) => (
             <span
               key={skill}
               className="inline-flex items-center gap-1 rounded-md bg-muted px-2.5 py-1 text-sm"
             >
+              <button
+                type="button"
+                disabled={index === 0}
+                onClick={() => onReorder(index, index - 1)}
+                className="text-muted-foreground hover:text-foreground disabled:opacity-30 disabled:cursor-not-allowed"
+                aria-label={`Mover ${skill} para esquerda`}
+              >
+                ←
+              </button>
               {skill}
+              <button
+                type="button"
+                disabled={index === skills.length - 1}
+                onClick={() => onReorder(index, index + 1)}
+                className="text-muted-foreground hover:text-foreground disabled:opacity-30 disabled:cursor-not-allowed"
+                aria-label={`Mover ${skill} para direita`}
+              >
+                →
+              </button>
               <button
                 type="button"
                 onClick={() => removeSkill(skill)}

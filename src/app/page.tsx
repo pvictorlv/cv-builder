@@ -20,6 +20,7 @@ export default function Home() {
   const [mounted, setMounted] = useState(false);
   const [template, setTemplate] = useState<TemplateName>("classic");
   const [aiSettingsOpen, setAiSettingsOpen] = useState(false);
+  const [useExperienceForSummary, setUseExperienceForSummary] = useState(false);
 
   const form = useCvForm();
 
@@ -68,6 +69,7 @@ export default function Home() {
               onUpdateEducation={form.updateEducation}
               onRemoveEducation={form.removeEducation}
               onSkillsChange={form.setSkills}
+              onReorderSkills={form.reorderSkills}
               onAddCertification={form.addCertification}
               onUpdateCertification={form.updateCertification}
               onRemoveCertification={form.removeCertification}
@@ -75,12 +77,32 @@ export default function Home() {
               onUpdateLanguage={form.updateLanguage}
               onRemoveLanguage={form.removeLanguage}
               summaryAiButton={
-                <AISuggestionButton
-                  action="improve-summary"
-                  context={{ summary: form.cvData.professionalSummary.summary }}
-                  onAccept={(result) => form.setSummary(result)}
-                  label="Melhorar com IA"
-                />
+                <div className="flex items-center gap-3">
+                  {form.cvData.workExperience.items.length > 0 && (
+                    <label className="flex cursor-pointer items-center gap-1.5 text-xs text-muted-foreground select-none">
+                      <input
+                        type="checkbox"
+                        checked={useExperienceForSummary}
+                        onChange={(e) => setUseExperienceForSummary(e.target.checked)}
+                        className="h-3.5 w-3.5 accent-primary"
+                      />
+                      Usar experiências
+                    </label>
+                  )}
+                  <AISuggestionButton
+                    action="improve-summary"
+                    context={{
+                      summary: form.cvData.professionalSummary.summary,
+                      ...(useExperienceForSummary && {
+                        workExperience: form.cvData.workExperience.items.map(
+                          ({ role, company, description }) => ({ role, company, description }),
+                        ),
+                      }),
+                    }}
+                    onAccept={(result) => form.setSummary(result)}
+                    label="Melhorar com IA"
+                  />
+                </div>
               }
               skillsAiButton={
                 <AISuggestionButton

@@ -5,8 +5,8 @@ export const contactInfoSchema = z.object({
   email: z.string().email("Email inválido").or(z.literal("")),
   phone: z.string(),
   location: z.string(),
-  linkedin: z.string().url("URL inválida").or(z.literal("")),
-  portfolio: z.string().url("URL inválida").or(z.literal("")),
+  linkedin: z.string(),
+  portfolio: z.string(),
   photoUrl: z.string(),
 });
 

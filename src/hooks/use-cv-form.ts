@@ -24,6 +24,7 @@ type Action =
   | { type: "UPDATE_EDUCATION"; payload: { id: string; data: Partial<EducationItem> } }
   | { type: "REMOVE_EDUCATION"; payload: string }
   | { type: "SET_SKILLS"; payload: string[] }
+  | { type: "REORDER_SKILLS"; payload: { fromIndex: number; toIndex: number } }
   | { type: "ADD_CERTIFICATION"; payload: CertificationItem }
   | { type: "UPDATE_CERTIFICATION"; payload: { id: string; data: Partial<CertificationItem> } }
   | { type: "REMOVE_CERTIFICATION"; payload: string }
@@ -120,6 +121,17 @@ function cvReducer(state: CVData, action: Action): CVData {
         ...state,
         skills: { items: action.payload },
       };
+
+    case "REORDER_SKILLS": {
+      const { fromIndex, toIndex } = action.payload;
+      const items = [...state.skills.items];
+      const [moved] = items.splice(fromIndex, 1);
+      items.splice(toIndex, 0, moved);
+      return {
+        ...state,
+        skills: { items },
+      };
+    }
 
     case "ADD_CERTIFICATION":
       return {
@@ -229,6 +241,10 @@ export function useCvForm(initialData: CVData = EMPTY_CV_DATA) {
     dispatch({ type: "SET_SKILLS", payload: items });
   }, []);
 
+  const reorderSkills = useCallback((fromIndex: number, toIndex: number) => {
+    dispatch({ type: "REORDER_SKILLS", payload: { fromIndex, toIndex } });
+  }, []);
+
   const addCertification = useCallback((item: CertificationItem) => {
     dispatch({ type: "ADD_CERTIFICATION", payload: item });
   }, []);
@@ -266,6 +282,7 @@ export function useCvForm(initialData: CVData = EMPTY_CV_DATA) {
     updateEducation,
     removeEducation,
     setSkills,
+    reorderSkills,
     addCertification,
     updateCertification,
     removeCertification,

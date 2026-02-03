@@ -22,6 +22,7 @@ interface CvEditorProps {
   onUpdateEducation: (id: string, data: Partial<EducationItem>) => void;
   onRemoveEducation: (id: string) => void;
   onSkillsChange: (skills: string[]) => void;
+  onReorderSkills: (fromIndex: number, toIndex: number) => void;
   onAddCertification: (item: CertificationItem) => void;
   onUpdateCertification: (id: string, data: Partial<CertificationItem>) => void;
   onRemoveCertification: (id: string) => void;
@@ -45,6 +46,7 @@ export function CvEditor({
   onUpdateEducation,
   onRemoveEducation,
   onSkillsChange,
+  onReorderSkills,
   onAddCertification,
   onUpdateCertification,
   onRemoveCertification,
@@ -80,6 +82,7 @@ export function CvEditor({
       <SkillsForm
         skills={cvData.skills.items}
         onChange={onSkillsChange}
+        onReorder={onReorderSkills}
         aiButton={skillsAiButton}
       />
       <CertificationsForm
