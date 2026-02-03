@@ -14,6 +14,7 @@ interface WorkExperienceFormProps {
   onAdd: (item: WorkExperienceItem) => void;
   onUpdate: (id: string, data: Partial<WorkExperienceItem>) => void;
   onRemove: (id: string) => void;
+  onReorder: (fromIndex: number, toIndex: number) => void;
   renderAiButton?: (itemId: string) => ReactNode;
 }
 
@@ -22,6 +23,7 @@ export function WorkExperienceForm({
   onAdd,
   onUpdate,
   onRemove,
+  onReorder,
   renderAiButton,
 }: WorkExperienceFormProps) {
   function handleAdd() {
@@ -52,12 +54,38 @@ export function WorkExperienceForm({
         </p>
       )}
       <div className="space-y-4">
-        {items.map((item) => {
+        {items.map((item, index) => {
           const fieldLabels = WORK_TYPE_FIELD_LABELS[item.type ?? "fulltime"] ?? WORK_TYPE_FIELD_LABELS.fulltime;
           return (
             <div key={item.id} className="space-y-3 rounded-md border border-border p-3">
               <div className="flex items-center justify-between">
-                <div>{renderAiButton?.(item.id)}</div>
+                <div className="flex items-center gap-1">
+                  {renderAiButton?.(item.id)}
+                  <div className="flex items-center">
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="icon"
+                      onClick={() => onReorder(index, index - 1)}
+                      disabled={index === 0}
+                      aria-label="Mover para cima"
+                      className="h-7 w-7"
+                    >
+                      ↑
+                    </Button>
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="icon"
+                      onClick={() => onReorder(index, index + 1)}
+                      disabled={index === items.length - 1}
+                      aria-label="Mover para baixo"
+                      className="h-7 w-7"
+                    >
+                      ↓
+                    </Button>
+                  </div>
+                </div>
                 <Button
                   type="button"
                   variant="ghost"

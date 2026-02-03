@@ -19,6 +19,7 @@ type Action =
   | { type: "ADD_WORK"; payload: WorkExperienceItem }
   | { type: "UPDATE_WORK"; payload: { id: string; data: Partial<WorkExperienceItem> } }
   | { type: "REMOVE_WORK"; payload: string }
+  | { type: "REORDER_WORK"; payload: { fromIndex: number; toIndex: number } }
   | { type: "ADD_EDUCATION"; payload: EducationItem }
   | { type: "UPDATE_EDUCATION"; payload: { id: string; data: Partial<EducationItem> } }
   | { type: "REMOVE_EDUCATION"; payload: string }
@@ -74,6 +75,17 @@ function cvReducer(state: CVData, action: Action): CVData {
           items: state.workExperience.items.filter((item) => item.id !== action.payload),
         },
       };
+
+    case "REORDER_WORK": {
+      const { fromIndex, toIndex } = action.payload;
+      const items = [...state.workExperience.items];
+      const [moved] = items.splice(fromIndex, 1);
+      items.splice(toIndex, 0, moved);
+      return {
+        ...state,
+        workExperience: { items },
+      };
+    }
 
     case "ADD_EDUCATION":
       return {
@@ -197,6 +209,10 @@ export function useCvForm(initialData: CVData = EMPTY_CV_DATA) {
     dispatch({ type: "REMOVE_WORK", payload: id });
   }, []);
 
+  const reorderWork = useCallback((fromIndex: number, toIndex: number) => {
+    dispatch({ type: "REORDER_WORK", payload: { fromIndex, toIndex } });
+  }, []);
+
   const addEducation = useCallback((item: EducationItem) => {
     dispatch({ type: "ADD_EDUCATION", payload: item });
   }, []);
@@ -245,6 +261,7 @@ export function useCvForm(initialData: CVData = EMPTY_CV_DATA) {
     addWork,
     updateWork,
     removeWork,
+    reorderWork,
     addEducation,
     updateEducation,
     removeEducation,

@@ -17,6 +17,7 @@ interface CvEditorProps {
   onAddWork: (item: WorkExperienceItem) => void;
   onUpdateWork: (id: string, data: Partial<WorkExperienceItem>) => void;
   onRemoveWork: (id: string) => void;
+  onReorderWork: (fromIndex: number, toIndex: number) => void;
   onAddEducation: (item: EducationItem) => void;
   onUpdateEducation: (id: string, data: Partial<EducationItem>) => void;
   onRemoveEducation: (id: string) => void;
@@ -39,6 +40,7 @@ export function CvEditor({
   onAddWork,
   onUpdateWork,
   onRemoveWork,
+  onReorderWork,
   onAddEducation,
   onUpdateEducation,
   onRemoveEducation,
@@ -66,6 +68,7 @@ export function CvEditor({
         onAdd={onAddWork}
         onUpdate={onUpdateWork}
         onRemove={onRemoveWork}
+        onReorder={onReorderWork}
         renderAiButton={renderWorkAiButton}
       />
       <EducationForm

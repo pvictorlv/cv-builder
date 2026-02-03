@@ -60,6 +60,7 @@ export default function Home() {
               onAddWork={form.addWork}
               onUpdateWork={form.updateWork}
               onRemoveWork={form.removeWork}
+              onReorderWork={form.reorderWork}
               onAddEducation={form.addEducation}
               onUpdateEducation={form.updateEducation}
               onRemoveEducation={form.removeEducation}
