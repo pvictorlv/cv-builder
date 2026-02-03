@@ -1,5 +1,6 @@
 "use client";
 
+import { memo } from "react";
 import dynamic from "next/dynamic";
 import { type CVData, type TemplateName } from "@/types/cv";
 import { getTemplateComponent } from "./templates/get-template";
@@ -25,7 +26,7 @@ function getFileName(name: string): string {
   return slug ? `cv-${slug}.pdf` : "cv.pdf";
 }
 
-export function PdfDownloadButton({ data, template }: PdfDownloadButtonProps) {
+export const PdfDownloadButton = memo(function PdfDownloadButton({ data, template }: PdfDownloadButtonProps) {
   return (
     <BlobProvider document={getTemplateComponent(template, data)}>
       {({ url, loading }) => (
@@ -46,4 +47,4 @@ export function PdfDownloadButton({ data, template }: PdfDownloadButtonProps) {
       )}
     </BlobProvider>
   );
-}
+});

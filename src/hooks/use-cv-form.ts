@@ -52,7 +52,7 @@ function cvReducer(state: CVData, action: Action): CVData {
       return {
         ...state,
         workExperience: {
-          items: [...state.workExperience.items, action.payload],
+          items: [action.payload, ...state.workExperience.items],
         },
       };
 
