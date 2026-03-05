@@ -1,6 +1,6 @@
 import type { ProfessionalArea } from "@/types/cv";
 
-export type AIAction = "improve-summary" | "improve-bullets" | "suggest-skills";
+export type AIAction = "improve-summary" | "improve-bullets" | "suggest-skills" | "parse-cv" | "translate-cv" | "analyze-cv";
 
 interface PromptContext {
   summary?: string;
@@ -11,6 +11,9 @@ interface PromptContext {
   type?: string;
   workExperience?: { role: string; company: string; description: string }[];
   professionalArea?: ProfessionalArea;
+  cvText?: string;
+  cvJson?: string;
+  targetLanguage?: string;
 }
 
 interface AreaConfig {
@@ -72,6 +75,12 @@ export function buildPrompt(action: AIAction, context: PromptContext): string {
       return buildBulletsPrompt(context, config);
     case "suggest-skills":
       return buildSkillsPrompt(context, config);
+    case "parse-cv":
+      return buildParseCvPrompt(context);
+    case "translate-cv":
+      return buildTranslateCvPrompt(context);
+    case "analyze-cv":
+      return buildAnalyzeCvPrompt(context, config);
   }
 }
 
@@ -186,4 +195,134 @@ Regras:
 - Responda APENAS com a lista de skills, uma por linha, sem explicações, numeração, categorização ou prefixos
 
 Skills atuais: ${context.currentSkills?.join(", ") || "nenhuma"}`;
+}
+
+function buildParseCvPrompt(context: PromptContext): string {
+  return `Você é um parser de currículos. Extraia as informações do texto abaixo e retorne um JSON válido no formato especificado.
+
+Texto do currículo:
+${context.cvText}
+
+Retorne APENAS um JSON válido (sem markdown, sem comentários, sem explicações) com esta estrutura exata:
+{
+  "contactInfo": {
+    "name": "",
+    "email": "",
+    "phone": "",
+    "location": "",
+    "linkedin": "",
+    "portfolio": "",
+    "photoUrl": ""
+  },
+  "professionalSummary": {
+    "summary": ""
+  },
+  "workExperience": {
+    "items": [
+      {
+        "type": "fulltime",
+        "role": "",
+        "company": "",
+        "startDate": "YYYY-MM",
+        "endDate": "YYYY-MM",
+        "current": false,
+        "description": "bullet 1\\nbullet 2"
+      }
+    ]
+  },
+  "education": {
+    "items": [
+      {
+        "course": "",
+        "institution": "",
+        "startDate": "YYYY-MM",
+        "endDate": "YYYY-MM",
+        "current": false
+      }
+    ]
+  },
+  "skills": {
+    "items": ["skill1", "skill2"]
+  },
+  "certifications": {
+    "items": [
+      {
+        "name": "",
+        "issuer": "",
+        "date": "YYYY-MM",
+        "url": ""
+      }
+    ]
+  },
+  "languages": {
+    "items": [
+      {
+        "language": "",
+        "level": "Básico|Intermediário|Avançado|Fluente|Nativo"
+      }
+    ]
+  }
+}
+
+Regras:
+- Preencha apenas os campos que conseguir extrair do texto
+- Datas no formato YYYY-MM (ex: 2024-01)
+- Se o candidato está no cargo atual, use current: true e endDate vazio
+- type pode ser: fulltime, freelance, sideproject, internship
+- level de idioma deve ser exatamente um de: Básico, Intermediário, Avançado, Fluente, Nativo
+- Não invente informações que não existem no texto
+- Retorne APENAS o JSON, sem nenhum texto adicional`;
+}
+
+function buildTranslateCvPrompt(context: PromptContext): string {
+  return `Você é um tradutor profissional especializado em currículos e documentos corporativos.
+
+Traduza o currículo abaixo para ${context.targetLanguage || "inglês"}, mantendo a mesma estrutura JSON.
+
+JSON do currículo:
+${context.cvJson}
+
+Regras:
+- Traduza TODOS os campos de texto (nome de cargos, descrições, habilidades, nomes de cursos, etc.)
+- NÃO traduza: nomes próprios de pessoas, nomes de empresas, nomes de ferramentas/tecnologias, URLs, emails, telefones
+- Mantenha a mesma estrutura JSON exata
+- Adapte títulos de cargos para equivalentes reconhecidos no mercado internacional (ex: "Desenvolvedor Sênior" -> "Senior Developer")
+- Mantenha datas no formato original
+- Traduza os níveis de idioma para o equivalente (Básico->Basic, Intermediário->Intermediate, Avançado->Advanced, Fluente->Fluent, Nativo->Native) se traduzir para inglês, ou equivalentes na língua alvo
+- Retorne APENAS o JSON traduzido, sem explicações`;
+}
+
+function buildAnalyzeCvPrompt(context: PromptContext, config: AreaConfig): string {
+  return `Você é um recrutador sênior experiente em ${config.label} no mercado brasileiro, com mais de 10 anos contratando profissionais.
+
+Analise o currículo abaixo como se fosse avaliar o candidato para uma vaga. Dê feedback honesto e construtivo.
+
+JSON do currículo:
+${context.cvJson}
+
+Forneça sua análise nos seguintes tópicos, usando esta estrutura EXATA (com os headers em ##):
+
+## Primeira Impressão
+Como recrutador, qual sua primeira impressão ao abrir este currículo? (2-3 frases)
+
+## Pontos Fortes
+Liste os 3-5 pontos mais fortes deste currículo, explicando por que cada um se destaca.
+
+## Pontos de Melhoria
+Liste os 3-5 pontos que precisam de melhoria, com sugestões concretas de como melhorar cada um.
+
+## Compatibilidade ATS
+Avalie de 1 a 10 a compatibilidade deste currículo com sistemas ATS. Explique o que está bom e o que pode melhorar para passar pelos filtros automáticos.
+
+## Adequação para ${config.label}
+O currículo está bem posicionado para vagas em ${config.label}? O que poderia ser ajustado para melhor aderência ao mercado?
+
+## Nota Geral
+Dê uma nota de 1 a 10 para o currículo como um todo e um resumo final em 2-3 frases.
+
+Regras:
+- Seja direto e prático, sem rodeios
+- Dê exemplos concretos quando sugerir melhorias
+- Considere o mercado brasileiro
+- Responda em português`;
 }

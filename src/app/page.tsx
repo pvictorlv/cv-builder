@@ -14,6 +14,9 @@ import { Header } from "@/components/layout/header";
 import { Footer } from "@/components/layout/footer";
 import { AISettingsDialog } from "@/components/ai/ai-settings-dialog";
 import { AISuggestionButton } from "@/components/ai/ai-suggestion-button";
+import { CvAnalysisDialog } from "@/components/ai/cv-analysis-dialog";
+import { CvUploadButton } from "@/components/cv-form/cv-upload-button";
+import { TranslatedExportButton } from "@/components/pdf/translated-export-button";
 import { ToastProvider } from "@/components/ui/toast";
 
 export default function Home() {
@@ -57,6 +60,10 @@ export default function Home() {
         <main className="mx-auto flex w-full max-w-screen-2xl flex-1 flex-col gap-4 p-4 lg:flex-row">
           {/* Editor */}
           <div className="flex-1 overflow-y-auto lg:max-h-[calc(100vh-8rem)]">
+            <div className="mb-4 flex items-center gap-2">
+              <CvUploadButton onParsed={form.setAll} />
+              <span className="text-xs text-muted-foreground">Importe um PDF para preencher automaticamente</span>
+            </div>
             <CvEditor
               cvData={form.cvData}
               onProfessionalAreaChange={form.setProfessionalArea}
@@ -148,10 +155,14 @@ export default function Home() {
 
           {/* Preview */}
           <div className="flex flex-col gap-3 lg:w-[600px] lg:shrink-0">
-            <div className="flex items-center justify-between gap-2">
+            <div className="flex flex-wrap items-center justify-between gap-2">
               <TemplateSelector value={template} onChange={handleTemplateChange} />
-              <PdfDownloadButton data={debouncedCvData} template={template} />
+              <div className="flex items-center gap-2">
+                <CvAnalysisDialog data={debouncedCvData} />
+                <PdfDownloadButton data={debouncedCvData} template={template} />
+              </div>
             </div>
+            <TranslatedExportButton data={debouncedCvData} template={template} />
             <div className="h-[700px] overflow-hidden rounded-lg border border-border bg-white lg:h-[calc(100vh-11rem)]">
               <PdfPreview data={debouncedCvData} template={template} />
             </div>
