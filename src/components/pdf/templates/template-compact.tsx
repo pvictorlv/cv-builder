@@ -96,11 +96,11 @@ export function TemplateCompact({ data }: TemplateCompactProps) {
           </View>
         )}
 
-        {workExperience.items.filter((i) => i.type !== "sideproject").length > 0 && (
+        {workExperience.items.filter((i) => i.startDate || i.endDate || i.current).length > 0 && (
           <View>
             <Text style={styles.sectionHeader}>{SECTION_HEADERS.workExperience}</Text>
             {workExperience.items
-              .filter((i) => i.type !== "sideproject")
+              .filter((i) => i.startDate || i.endDate || i.current)
               .map((item) => (
                 <View key={item.id} style={{ marginBottom: 4 }}>
                   <View style={styles.itemHeader}>
@@ -126,11 +126,11 @@ export function TemplateCompact({ data }: TemplateCompactProps) {
           </View>
         )}
 
-        {workExperience.items.filter((i) => i.type === "sideproject").length > 0 && (
+        {workExperience.items.filter((i) => !i.startDate && !i.endDate && !i.current).length > 0 && (
           <View>
             <Text style={styles.sectionHeader}>{SECTION_HEADERS.projects}</Text>
             {workExperience.items
-              .filter((i) => i.type === "sideproject")
+              .filter((i) => !i.startDate && !i.endDate && !i.current)
               .map((item) => (
                 <View key={item.id} style={{ marginBottom: 4 }}>
                   <Text style={styles.bold}>{item.role}</Text>

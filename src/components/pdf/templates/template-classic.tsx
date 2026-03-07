@@ -102,10 +102,10 @@ export function TemplateClassic({ data }: TemplateClassicProps) {
         )}
 
         {/* Work Experience */}
-        {workExperience.items.filter((i) => i.type !== "sideproject").length > 0 && (
+        {workExperience.items.filter((i) => i.startDate || i.endDate || i.current).length > 0 && (
           <View>
             <Text style={styles.sectionHeader}>{SECTION_HEADERS.workExperience}</Text>
-            {workExperience.items.filter((i) => i.type !== "sideproject").map((item) => (
+            {workExperience.items.filter((i) => i.startDate || i.endDate || i.current).map((item) => (
               <View key={item.id} style={{ marginBottom: 8 }}>
                 <View style={styles.itemHeader}>
                   <Text style={styles.bold}>{item.role}</Text>
@@ -128,10 +128,10 @@ export function TemplateClassic({ data }: TemplateClassicProps) {
         )}
 
         {/* Projects */}
-        {workExperience.items.filter((i) => i.type === "sideproject").length > 0 && (
+        {workExperience.items.filter((i) => !i.startDate && !i.endDate && !i.current).length > 0 && (
           <View>
             <Text style={styles.sectionHeader}>{SECTION_HEADERS.projects}</Text>
-            {workExperience.items.filter((i) => i.type === "sideproject").map((item) => (
+            {workExperience.items.filter((i) => !i.startDate && !i.endDate && !i.current).map((item) => (
               <View key={item.id} style={{ marginBottom: 6 }}>
                 <Text style={styles.bold}>{item.role}</Text>
                 {item.company && (
