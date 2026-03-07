@@ -8,6 +8,7 @@ export const STORAGE_KEYS = {
 export const SECTION_HEADERS = {
   professionalSummary: "RESUMO PROFISSIONAL",
   workExperience: "EXPERIÊNCIA PROFISSIONAL",
+  projects: "PROJETOS",
   education: "FORMAÇÃO ACADÊMICA",
   skills: "HABILIDADES",
   certifications: "CERTIFICAÇÕES",

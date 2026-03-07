@@ -102,10 +102,10 @@ export function TemplateClassic({ data }: TemplateClassicProps) {
         )}
 
         {/* Work Experience */}
-        {workExperience.items.length > 0 && (
+        {workExperience.items.filter((i) => i.type !== "sideproject").length > 0 && (
           <View>
             <Text style={styles.sectionHeader}>{SECTION_HEADERS.workExperience}</Text>
-            {workExperience.items.map((item) => (
+            {workExperience.items.filter((i) => i.type !== "sideproject").map((item) => (
               <View key={item.id} style={{ marginBottom: 8 }}>
                 <View style={styles.itemHeader}>
                   <Text style={styles.bold}>{item.role}</Text>
@@ -115,6 +115,27 @@ export function TemplateClassic({ data }: TemplateClassicProps) {
                 </View>
                 {(item.company || (item.type && item.type !== "fulltime")) && (
                   <Text style={styles.italic}>{formatCompanyWithType(item.company, item.type ?? "fulltime")}</Text>
+                )}
+                {item.description &&
+                  item.description.split("\n").filter(Boolean).map((line, i) => (
+                    <Text key={i} style={styles.bullet}>
+                      {"\u2022"} {line.replace(/^[-•]\s*/, "")}
+                    </Text>
+                  ))}
+              </View>
+            ))}
+          </View>
+        )}
+
+        {/* Projects */}
+        {workExperience.items.filter((i) => i.type === "sideproject").length > 0 && (
+          <View>
+            <Text style={styles.sectionHeader}>{SECTION_HEADERS.projects}</Text>
+            {workExperience.items.filter((i) => i.type === "sideproject").map((item) => (
+              <View key={item.id} style={{ marginBottom: 6 }}>
+                <Text style={styles.bold}>{item.role}</Text>
+                {item.company && (
+                  <Text style={styles.italic}>{item.company}</Text>
                 )}
                 {item.description &&
                   item.description.split("\n").filter(Boolean).map((line, i) => (

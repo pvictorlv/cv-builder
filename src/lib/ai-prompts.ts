@@ -269,6 +269,7 @@ Regras:
 - Datas no formato YYYY-MM (ex: 2024-01)
 - Se o candidato está no cargo atual, use current: true e endDate vazio
 - type pode ser: fulltime, freelance, sideproject, internship
+- Para sideproject, startDate e endDate podem ser vazios (projetos pessoais não precisam de datas)
 - level de idioma deve ser exatamente um de: Básico, Intermediário, Avançado, Fluente, Nativo
 - Não invente informações que não existem no texto
 - Retorne APENAS o JSON, sem nenhum texto adicional`;

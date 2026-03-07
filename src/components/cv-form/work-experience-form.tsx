@@ -101,7 +101,13 @@ export function WorkExperienceForm({
                 <select
                   className="w-full rounded-md border border-border bg-background px-3 py-2 text-sm"
                   value={item.type ?? "fulltime"}
-                  onChange={(e) => onUpdate(item.id, { type: e.target.value as WorkExperienceItem["type"] })}
+                  onChange={(e) => {
+                    const type = e.target.value as WorkExperienceItem["type"];
+                    onUpdate(item.id, {
+                      type,
+                      ...(type === "sideproject" ? { startDate: "", endDate: "", current: false } : {}),
+                    });
+                  }}
                 >
                   {Object.entries(WORK_TYPE_LABELS).map(([value, label]) => (
                     <option key={value} value={value}>{label}</option>
@@ -121,34 +127,38 @@ export function WorkExperienceForm({
                   value={item.company}
                   onChange={(e) => onUpdate(item.id, { company: e.target.value })}
                 />
-                <Input
-                  label="Data de início"
-                  type="month"
-                  value={item.startDate}
-                  onChange={(e) => onUpdate(item.id, { startDate: e.target.value })}
-                />
-                <div>
-                  <Input
-                    label="Data de término"
-                    type="month"
-                    value={item.endDate}
-                    disabled={item.current}
-                    onChange={(e) => onUpdate(item.id, { endDate: e.target.value })}
-                  />
-                  <label className="mt-1 flex items-center gap-2 text-sm">
-                    <input
-                      type="checkbox"
-                      checked={item.current}
-                      onChange={(e) =>
-                        onUpdate(item.id, {
-                          current: e.target.checked,
-                          endDate: e.target.checked ? "" : item.endDate,
-                        })
-                      }
+                {item.type !== "sideproject" && (
+                  <>
+                    <Input
+                      label="Data de início"
+                      type="month"
+                      value={item.startDate}
+                      onChange={(e) => onUpdate(item.id, { startDate: e.target.value })}
                     />
-                    Atual
-                  </label>
-                </div>
+                    <div>
+                      <Input
+                        label="Data de término"
+                        type="month"
+                        value={item.endDate}
+                        disabled={item.current}
+                        onChange={(e) => onUpdate(item.id, { endDate: e.target.value })}
+                      />
+                      <label className="mt-1 flex items-center gap-2 text-sm">
+                        <input
+                          type="checkbox"
+                          checked={item.current}
+                          onChange={(e) =>
+                            onUpdate(item.id, {
+                              current: e.target.checked,
+                              endDate: e.target.checked ? "" : item.endDate,
+                            })
+                          }
+                        />
+                        Atual
+                      </label>
+                    </div>
+                  </>
+                )}
               </div>
               <Textarea
                 label="Descrição (use bullets separados por linha)"

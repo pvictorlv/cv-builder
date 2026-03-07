@@ -96,31 +96,55 @@ export function TemplateCompact({ data }: TemplateCompactProps) {
           </View>
         )}
 
-        {workExperience.items.length > 0 && (
+        {workExperience.items.filter((i) => i.type !== "sideproject").length > 0 && (
           <View>
             <Text style={styles.sectionHeader}>{SECTION_HEADERS.workExperience}</Text>
-            {workExperience.items.map((item) => (
-              <View key={item.id} style={{ marginBottom: 4 }}>
-                <View style={styles.itemHeader}>
-                  <Text style={styles.bold}>
-                    {item.role}
-                    {(() => {
-                      const formatted = formatCompanyWithType(item.company, item.type ?? "fulltime");
-                      return formatted ? ` – ${formatted}` : "";
-                    })()}
-                  </Text>
-                  <Text style={styles.italic}>
-                    {formatDateRange(item.startDate, item.endDate, item.current)}
-                  </Text>
-                </View>
-                {item.description &&
-                  item.description.split("\n").filter(Boolean).map((line, i) => (
-                    <Text key={i} style={styles.bullet}>
-                      {"–"} {line.replace(/^[-•]\s*/, "")}
+            {workExperience.items
+              .filter((i) => i.type !== "sideproject")
+              .map((item) => (
+                <View key={item.id} style={{ marginBottom: 4 }}>
+                  <View style={styles.itemHeader}>
+                    <Text style={styles.bold}>
+                      {item.role}
+                      {(() => {
+                        const formatted = formatCompanyWithType(item.company, item.type ?? "fulltime");
+                        return formatted ? ` – ${formatted}` : "";
+                      })()}
                     </Text>
-                  ))}
-              </View>
-            ))}
+                    <Text style={styles.italic}>
+                      {formatDateRange(item.startDate, item.endDate, item.current)}
+                    </Text>
+                  </View>
+                  {item.description &&
+                    item.description.split("\n").filter(Boolean).map((line, i) => (
+                      <Text key={i} style={styles.bullet}>
+                        {"–"} {line.replace(/^[-•]\s*/, "")}
+                      </Text>
+                    ))}
+                </View>
+              ))}
+          </View>
+        )}
+
+        {workExperience.items.filter((i) => i.type === "sideproject").length > 0 && (
+          <View>
+            <Text style={styles.sectionHeader}>{SECTION_HEADERS.projects}</Text>
+            {workExperience.items
+              .filter((i) => i.type === "sideproject")
+              .map((item) => (
+                <View key={item.id} style={{ marginBottom: 4 }}>
+                  <Text style={styles.bold}>{item.role}</Text>
+                  {item.company && (
+                    <Text style={styles.italic}>{item.company}</Text>
+                  )}
+                  {item.description &&
+                    item.description.split("\n").filter(Boolean).map((line, i) => (
+                      <Text key={i} style={styles.bullet}>
+                        {"–"} {line.replace(/^[-•]\s*/, "")}
+                      </Text>
+                    ))}
+                </View>
+              ))}
           </View>
         )}
 
