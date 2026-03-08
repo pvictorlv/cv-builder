@@ -5,7 +5,7 @@ import { AI_DEFAULTS, OPENROUTER_BASE_URL } from "@/lib/constants";
 import { buildPrompt, type AIAction } from "@/lib/ai-prompts";
 
 const requestSchema = z.object({
-  action: z.enum(["improve-summary", "improve-bullets", "suggest-skills"]),
+  action: z.enum(["improve-summary", "improve-bullets", "suggest-skills", "parse-cv", "translate-cv", "analyze-cv"]),
   context: z.record(z.string(), z.unknown()),
 });
 

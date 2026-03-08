@@ -35,3 +35,21 @@ export async function fetchAISuggestion(
   const data: AIResponse = await response.json();
   return data.result;
 }
+
+export async function extractPdfText(file: File): Promise<string> {
+  const formData = new FormData();
+  formData.append("file", file);
+
+  const response = await fetch("/api/parse-pdf", {
+    method: "POST",
+    body: formData,
+  });
+
+  if (!response.ok) {
+    const error = await response.json().catch(() => ({ error: "Erro ao processar PDF" }));
+    throw new Error(error.error || `Erro ${response.status}`);
+  }
+
+  const data: { text: string } = await response.json();
+  return data.text;
+}

@@ -1,6 +1,6 @@
 import { Document, Page, Text, View, StyleSheet } from "@react-pdf/renderer";
 import { type CVData } from "@/types/cv";
-import { SECTION_HEADERS } from "@/lib/constants";
+import { SECTION_HEADERS, type SectionHeaders, type LocaleStrings } from "@/lib/constants";
 import { formatDate, formatDateRange, formatCompanyWithType } from "@/lib/utils";
 
 const styles = StyleSheet.create({
@@ -70,9 +70,12 @@ const styles = StyleSheet.create({
 
 interface TemplateCompactProps {
   data: CVData;
+  headers?: SectionHeaders;
+  locale?: LocaleStrings;
 }
 
-export function TemplateCompact({ data }: TemplateCompactProps) {
+export function TemplateCompact({ data, headers, locale }: TemplateCompactProps) {
+  const h = headers ?? locale?.sectionHeaders ?? SECTION_HEADERS;
   const { contactInfo, professionalSummary, workExperience, education, skills, certifications, languages } = data;
 
   const contactParts = [contactInfo.email, contactInfo.phone, contactInfo.location].filter(Boolean);
@@ -91,42 +94,66 @@ export function TemplateCompact({ data }: TemplateCompactProps) {
 
         {professionalSummary.summary && (
           <View>
-            <Text style={styles.sectionHeader}>{SECTION_HEADERS.professionalSummary}</Text>
+            <Text style={styles.sectionHeader}>{h.professionalSummary}</Text>
             <Text style={styles.text}>{professionalSummary.summary}</Text>
           </View>
         )}
 
-        {workExperience.items.length > 0 && (
+        {workExperience.items.filter((i) => i.startDate || i.endDate || i.current).length > 0 && (
           <View>
-            <Text style={styles.sectionHeader}>{SECTION_HEADERS.workExperience}</Text>
-            {workExperience.items.map((item) => (
-              <View key={item.id} style={{ marginBottom: 4 }}>
-                <View style={styles.itemHeader}>
-                  <Text style={styles.bold}>
-                    {item.role}
-                    {(() => {
-                      const formatted = formatCompanyWithType(item.company, item.type ?? "fulltime");
-                      return formatted ? ` – ${formatted}` : "";
-                    })()}
-                  </Text>
-                  <Text style={styles.italic}>
-                    {formatDateRange(item.startDate, item.endDate, item.current)}
-                  </Text>
-                </View>
-                {item.description &&
-                  item.description.split("\n").filter(Boolean).map((line, i) => (
-                    <Text key={i} style={styles.bullet}>
-                      {"–"} {line.replace(/^[-•]\s*/, "")}
+            <Text style={styles.sectionHeader}>{h.workExperience}</Text>
+            {workExperience.items
+              .filter((i) => i.startDate || i.endDate || i.current)
+              .map((item) => (
+                <View key={item.id} style={{ marginBottom: 4 }}>
+                  <View style={styles.itemHeader}>
+                    <Text style={styles.bold}>
+                      {item.role}
+                      {(() => {
+                        const formatted = formatCompanyWithType(item.company, item.type ?? "fulltime", item.location);
+                        return formatted ? ` – ${formatted}` : "";
+                      })()}
                     </Text>
-                  ))}
-              </View>
-            ))}
+                    <Text style={styles.italic}>
+                      {formatDateRange(item.startDate, item.endDate, item.current, locale)}
+                    </Text>
+                  </View>
+                  {item.description &&
+                    item.description.split("\n").filter(Boolean).map((line, i) => (
+                      <Text key={i} style={styles.bullet}>
+                        {"–"} {line.replace(/^[-•]\s*/, "")}
+                      </Text>
+                    ))}
+                </View>
+              ))}
+          </View>
+        )}
+
+        {workExperience.items.filter((i) => !i.startDate && !i.endDate && !i.current).length > 0 && (
+          <View wrap={false}>
+            <Text style={styles.sectionHeader}>{h.projects}</Text>
+            {workExperience.items
+              .filter((i) => !i.startDate && !i.endDate && !i.current)
+              .map((item) => (
+                <View key={item.id} style={{ marginBottom: 4 }}>
+                  <Text style={styles.bold}>{item.role}</Text>
+                  {(item.company || item.location) && (
+                    <Text style={styles.italic}>{[item.company, item.location].filter(Boolean).join(" · ")}</Text>
+                  )}
+                  {item.description &&
+                    item.description.split("\n").filter(Boolean).map((line, i) => (
+                      <Text key={i} style={styles.bullet}>
+                        {"–"} {line.replace(/^[-•]\s*/, "")}
+                      </Text>
+                    ))}
+                </View>
+              ))}
           </View>
         )}
 
         {education.items.length > 0 && (
           <View>
-            <Text style={styles.sectionHeader}>{SECTION_HEADERS.education}</Text>
+            <Text style={styles.sectionHeader}>{h.education}</Text>
             {education.items.map((item) => (
               <View key={item.id} style={{ marginBottom: 3 }}>
                 <View style={styles.itemHeader}>
@@ -135,7 +162,7 @@ export function TemplateCompact({ data }: TemplateCompactProps) {
                     {item.institution ? ` – ${item.institution}` : ""}
                   </Text>
                   <Text style={styles.italic}>
-                    {formatDateRange(item.startDate, item.endDate, item.current)}
+                    {formatDateRange(item.startDate, item.endDate, item.current, locale)}
                   </Text>
                 </View>
               </View>
@@ -145,20 +172,20 @@ export function TemplateCompact({ data }: TemplateCompactProps) {
 
         {skills.items.length > 0 && (
           <View>
-            <Text style={styles.sectionHeader}>{SECTION_HEADERS.skills}</Text>
+            <Text style={styles.sectionHeader}>{h.skills}</Text>
             <Text style={styles.skillsText}>{skills.items.join(", ")}</Text>
           </View>
         )}
 
         {certifications.items.length > 0 && (
           <View>
-            <Text style={styles.sectionHeader}>{SECTION_HEADERS.certifications}</Text>
+            <Text style={styles.sectionHeader}>{h.certifications}</Text>
             {certifications.items.map((item) => (
               <View key={item.id} style={styles.certItem}>
                 <Text style={styles.text}>
                   <Text style={styles.bold}>{item.name}</Text>
                   {item.issuer ? ` – ${item.issuer}` : ""}
-                  {item.date ? ` (${formatDate(item.date)})` : ""}
+                  {item.date ? ` (${formatDate(item.date, locale?.months)})` : ""}
                 </Text>
               </View>
             ))}
@@ -167,7 +194,7 @@ export function TemplateCompact({ data }: TemplateCompactProps) {
 
         {languages.items.length > 0 && (
           <View>
-            <Text style={styles.sectionHeader}>{SECTION_HEADERS.languages}</Text>
+            <Text style={styles.sectionHeader}>{h.languages}</Text>
             {languages.items.map((item) => (
               <View key={item.id} style={styles.langRow}>
                 <Text style={styles.text}>{item.language}</Text>

@@ -1,6 +1,6 @@
 import { Document, Page, Text, View, Image, StyleSheet } from "@react-pdf/renderer";
 import { type CVData } from "@/types/cv";
-import { SECTION_HEADERS } from "@/lib/constants";
+import { SECTION_HEADERS, type SectionHeaders, type LocaleStrings } from "@/lib/constants";
 import { formatDate, formatDateRange, formatCompanyWithType } from "@/lib/utils";
 
 const ACCENT = "#2563EB";
@@ -99,9 +99,12 @@ const styles = StyleSheet.create({
 
 interface TemplateCreativeProps {
   data: CVData;
+  headers?: SectionHeaders;
+  locale?: LocaleStrings;
 }
 
-export function TemplateCreative({ data }: TemplateCreativeProps) {
+export function TemplateCreative({ data, headers, locale }: TemplateCreativeProps) {
+  const h = headers ?? locale?.sectionHeaders ?? SECTION_HEADERS;
   const { contactInfo, professionalSummary, workExperience, education, skills, certifications, languages } = data;
 
   const contactParts = [
@@ -146,25 +149,46 @@ export function TemplateCreative({ data }: TemplateCreativeProps) {
           {/* Summary */}
           {professionalSummary.summary && (
             <View>
-              <Text style={styles.sectionHeader}>{SECTION_HEADERS.professionalSummary}</Text>
+              <Text style={styles.sectionHeader}>{h.professionalSummary}</Text>
               <Text style={styles.text}>{professionalSummary.summary}</Text>
             </View>
           )}
 
           {/* Work Experience */}
-          {workExperience.items.length > 0 && (
+          {workExperience.items.filter((i) => i.startDate || i.endDate || i.current).length > 0 && (
             <View>
-              <Text style={styles.sectionHeader}>{SECTION_HEADERS.workExperience}</Text>
-              {workExperience.items.map((item) => (
+              <Text style={styles.sectionHeader}>{h.workExperience}</Text>
+              {workExperience.items.filter((i) => i.startDate || i.endDate || i.current).map((item) => (
                 <View key={item.id} style={{ marginBottom: 8 }}>
                   <View style={styles.itemHeader}>
                     <Text style={styles.bold}>{item.role}</Text>
                     <Text style={styles.italic}>
-                      {formatDateRange(item.startDate, item.endDate, item.current)}
+                      {formatDateRange(item.startDate, item.endDate, item.current, locale)}
                     </Text>
                   </View>
                   {(item.company || (item.type && item.type !== "fulltime")) && (
-                    <Text style={styles.italic}>{formatCompanyWithType(item.company, item.type ?? "fulltime")}</Text>
+                    <Text style={styles.italic}>{formatCompanyWithType(item.company, item.type ?? "fulltime", item.location)}</Text>
+                  )}
+                  {item.description &&
+                    item.description.split("\n").filter(Boolean).map((line, i) => (
+                      <Text key={i} style={styles.bullet}>
+                        {"\u2022"} {line.replace(/^[-•]\s*/, "")}
+                      </Text>
+                    ))}
+                </View>
+              ))}
+            </View>
+          )}
+
+          {/* Projects */}
+          {workExperience.items.filter((i) => !i.startDate && !i.endDate && !i.current).length > 0 && (
+            <View wrap={false}>
+              <Text style={styles.sectionHeader}>{h.projects}</Text>
+              {workExperience.items.filter((i) => !i.startDate && !i.endDate && !i.current).map((item) => (
+                <View key={item.id} style={{ marginBottom: 8 }}>
+                  <Text style={styles.bold}>{item.role}</Text>
+                  {(item.company || item.location) && (
+                    <Text style={styles.italic}>{[item.company, item.location].filter(Boolean).join(" · ")}</Text>
                   )}
                   {item.description &&
                     item.description.split("\n").filter(Boolean).map((line, i) => (
@@ -180,13 +204,13 @@ export function TemplateCreative({ data }: TemplateCreativeProps) {
           {/* Education */}
           {education.items.length > 0 && (
             <View>
-              <Text style={styles.sectionHeader}>{SECTION_HEADERS.education}</Text>
+              <Text style={styles.sectionHeader}>{h.education}</Text>
               {education.items.map((item) => (
                 <View key={item.id} style={{ marginBottom: 6 }}>
                   <View style={styles.itemHeader}>
                     <Text style={styles.bold}>{item.course}</Text>
                     <Text style={styles.italic}>
-                      {formatDateRange(item.startDate, item.endDate, item.current)}
+                      {formatDateRange(item.startDate, item.endDate, item.current, locale)}
                     </Text>
                   </View>
                   {item.institution && (
@@ -200,7 +224,7 @@ export function TemplateCreative({ data }: TemplateCreativeProps) {
           {/* Skills */}
           {skills.items.length > 0 && (
             <View>
-              <Text style={styles.sectionHeader}>{SECTION_HEADERS.skills}</Text>
+              <Text style={styles.sectionHeader}>{h.skills}</Text>
               <View style={styles.skillsContainer}>
                 {skills.items.map((skill, i) => (
                   <Text key={i} style={styles.skillTag}>{skill}</Text>
@@ -212,13 +236,13 @@ export function TemplateCreative({ data }: TemplateCreativeProps) {
           {/* Certifications */}
           {certifications.items.length > 0 && (
             <View>
-              <Text style={styles.sectionHeader}>{SECTION_HEADERS.certifications}</Text>
+              <Text style={styles.sectionHeader}>{h.certifications}</Text>
               {certifications.items.map((item) => (
                 <View key={item.id} style={styles.certItem}>
                   <Text style={styles.text}>
                     <Text style={styles.bold}>{item.name}</Text>
                     {item.issuer ? ` – ${item.issuer}` : ""}
-                    {item.date ? ` (${formatDate(item.date)})` : ""}
+                    {item.date ? ` (${formatDate(item.date, locale?.months)})` : ""}
                   </Text>
                   {item.url && (
                     <Text style={{ fontSize: 9, color: "#555" }}>{item.url}</Text>
@@ -231,7 +255,7 @@ export function TemplateCreative({ data }: TemplateCreativeProps) {
           {/* Languages */}
           {languages.items.length > 0 && (
             <View>
-              <Text style={styles.sectionHeader}>{SECTION_HEADERS.languages}</Text>
+              <Text style={styles.sectionHeader}>{h.languages}</Text>
               {languages.items.map((item) => (
                 <View key={item.id} style={styles.langRow}>
                   <Text style={styles.text}>{item.language}</Text>

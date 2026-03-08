@@ -32,6 +32,7 @@ export function WorkExperienceForm({
       type: "fulltime",
       role: "",
       company: "",
+      location: "",
       startDate: "",
       endDate: "",
       current: false,
@@ -122,7 +123,13 @@ export function WorkExperienceForm({
                   onChange={(e) => onUpdate(item.id, { company: e.target.value })}
                 />
                 <Input
-                  label="Data de início"
+                  label="Localização (opcional)"
+                  placeholder="London, UK"
+                  value={item.location ?? ""}
+                  onChange={(e) => onUpdate(item.id, { location: e.target.value })}
+                />
+                <Input
+                  label="Data de início (opcional)"
                   type="month"
                   value={item.startDate}
                   onChange={(e) => onUpdate(item.id, { startDate: e.target.value })}
@@ -132,22 +139,29 @@ export function WorkExperienceForm({
                     label="Data de término"
                     type="month"
                     value={item.endDate}
-                    disabled={item.current}
+                    disabled={item.current || !item.startDate}
                     onChange={(e) => onUpdate(item.id, { endDate: e.target.value })}
                   />
-                  <label className="mt-1 flex items-center gap-2 text-sm">
-                    <input
-                      type="checkbox"
-                      checked={item.current}
-                      onChange={(e) =>
-                        onUpdate(item.id, {
-                          current: e.target.checked,
-                          endDate: e.target.checked ? "" : item.endDate,
-                        })
-                      }
-                    />
-                    Atual
-                  </label>
+                  {item.startDate && (
+                    <label className="mt-1 flex items-center gap-2 text-sm">
+                      <input
+                        type="checkbox"
+                        checked={item.current}
+                        onChange={(e) =>
+                          onUpdate(item.id, {
+                            current: e.target.checked,
+                            endDate: e.target.checked ? "" : item.endDate,
+                          })
+                        }
+                      />
+                      Atual
+                    </label>
+                  )}
+                  {!item.startDate && (
+                    <p className="mt-1 text-xs text-muted-foreground">
+                      Sem datas → aparece na seção &quot;Projetos&quot;
+                    </p>
+                  )}
                 </div>
               </div>
               <Textarea

@@ -1,6 +1,6 @@
 import type { ProfessionalArea } from "@/types/cv";
 
-export type AIAction = "improve-summary" | "improve-bullets" | "suggest-skills";
+export type AIAction = "improve-summary" | "improve-bullets" | "suggest-skills" | "parse-cv" | "translate-cv" | "analyze-cv";
 
 interface PromptContext {
   summary?: string;
@@ -11,6 +11,9 @@ interface PromptContext {
   type?: string;
   workExperience?: { role: string; company: string; description: string }[];
   professionalArea?: ProfessionalArea;
+  cvText?: string;
+  cvJson?: string;
+  targetLanguage?: string;
 }
 
 interface AreaConfig {
@@ -72,6 +75,12 @@ export function buildPrompt(action: AIAction, context: PromptContext): string {
       return buildBulletsPrompt(context, config);
     case "suggest-skills":
       return buildSkillsPrompt(context, config);
+    case "parse-cv":
+      return buildParseCvPrompt(context);
+    case "translate-cv":
+      return buildTranslateCvPrompt(context);
+    case "analyze-cv":
+      return buildAnalyzeCvPrompt(context, config);
   }
 }
 
@@ -96,6 +105,9 @@ Regras:
 - Priorize: competências dominadas, metodologias, resultados mensuráveis, senioridade
 - Use verbos de ação e linguagem direta e profissional
 - Mantenha primeira pessoa implícita (sem "eu")
+- Priorize informações que já existem no texto original. NÃO invente ferramentas ou experiências que não estejam no texto
+- Se o texto não menciona métricas, você pode sugerir métricas realistas e conservadoras (ex: "redução de 15%", "mais de 10 clientes") para dar impacto, mas sem exageros nem números grandiosos
+- Reorganize e melhore a redação do que já existe, adicionando o mínimo necessário
 - Evite clichês e termos vagos: "apaixonado", "proativo", "dinâmico", "busco desafios", "jogador de equipe", "rápido aprendizado", "multitarefas", "perfeccionista"
 - Use apenas texto plano, sem caracteres especiais ou decorativos (★, •, →, ■, |)
 - Máximo de 500 caracteres
@@ -155,9 +167,12 @@ ${rules}
 Métricas típicas da área (${config.label}): ${config.bulletMetrics}
 
 Regras gerais:
+- NÃO adicione ferramentas, tecnologias ou metodologias que não foram mencionadas no original
+- Se os bullets não mencionam métricas, você pode sugerir métricas realistas e conservadoras para dar impacto (ex: "redução de 20%", "atendimento de 50+ clientes"), mas sem exageros
+- Melhore a redação, estrutura e clareza do que já existe, adicionando o mínimo necessário
 - Mantenha EXATAMENTE a mesma quantidade de bullets da entrada
 - Cada bullet deve ter idealmente até 200 caracteres (recrutadores escaneiam rapidamente e ATS pode truncar linhas longas)
-- Use nomes oficiais e completos de ferramentas e metodologias
+- Use nomes oficiais e completos de ferramentas e metodologias mencionadas
 - Use apenas texto plano, sem caracteres especiais ou decorativos (★, •, →, ■, |)
 - Um bullet por linha, sem marcadores, prefixos ou numeração
 - Responda APENAS com os bullets reescritos, um por linha, sem explicações ou comentários
@@ -182,8 +197,148 @@ Regras:
 - Use o nome oficial e mais reconhecido de cada ferramenta/metodologia
 - Sugira skills no mesmo nível de especificidade das existentes
 - As sugestões devem ser coerentes com a área de ${config.label} — não sugira competências desconexas
-- Não repita nenhuma skill já listada
+- Não repita nenhuma skill já listada (verifique variações como "JS"/"JavaScript", "TS"/"TypeScript")
+- Sugira apenas skills que façam sentido com o perfil do candidato baseado nas skills existentes — não sugira skills aleatórias ou genéricas
 - Responda APENAS com a lista de skills, uma por linha, sem explicações, numeração, categorização ou prefixos
 
 Skills atuais: ${context.currentSkills?.join(", ") || "nenhuma"}`;
+}
+
+function buildParseCvPrompt(context: PromptContext): string {
+  return `Você é um parser de currículos. Extraia as informações do texto abaixo e retorne um JSON válido no formato especificado.
+
+Texto do currículo:
+${context.cvText}
+
+Retorne APENAS um JSON válido (sem markdown, sem comentários, sem explicações) com esta estrutura exata:
+{
+  "contactInfo": {
+    "name": "",
+    "email": "",
+    "phone": "",
+    "location": "",
+    "linkedin": "",
+    "portfolio": "",
+    "photoUrl": ""
+  },
+  "professionalSummary": {
+    "summary": ""
+  },
+  "workExperience": {
+    "items": [
+      {
+        "type": "fulltime",
+        "role": "",
+        "company": "",
+        "location": "",
+        "startDate": "YYYY-MM",
+        "endDate": "YYYY-MM",
+        "current": false,
+        "description": "bullet 1\\nbullet 2"
+      }
+    ]
+  },
+  "education": {
+    "items": [
+      {
+        "course": "",
+        "institution": "",
+        "startDate": "YYYY-MM",
+        "endDate": "YYYY-MM",
+        "current": false
+      }
+    ]
+  },
+  "skills": {
+    "items": ["skill1", "skill2"]
+  },
+  "certifications": {
+    "items": [
+      {
+        "name": "",
+        "issuer": "",
+        "date": "YYYY-MM",
+        "url": ""
+      }
+    ]
+  },
+  "languages": {
+    "items": [
+      {
+        "language": "",
+        "level": "Básico|Intermediário|Avançado|Fluente|Nativo"
+      }
+    ]
+  }
+}
+
+Regras:
+- Preencha apenas os campos que conseguir extrair do texto
+- Datas no formato YYYY-MM (ex: 2024-01)
+- Se o candidato está no cargo atual, use current: true e endDate vazio
+- type pode ser: fulltime, freelance, sideproject, internship
+- Para sideproject, startDate e endDate podem ser vazios (projetos pessoais não precisam de datas)
+- location é opcional: cidade e país onde trabalhou (ex: "London, UK", "São Paulo, SP")
+- level de idioma deve ser exatamente um de: Básico, Intermediário, Avançado, Fluente, Nativo
+- Não invente informações que não existem no texto
+- Retorne APENAS o JSON, sem nenhum texto adicional`;
+}
+
+function buildTranslateCvPrompt(context: PromptContext): string {
+  return `Você é um tradutor profissional especializado em currículos e documentos corporativos.
+
+Traduza o currículo abaixo para ${context.targetLanguage || "inglês"}, mantendo a mesma estrutura JSON.
+
+JSON do currículo:
+${context.cvJson}
+
+Regras:
+- Traduza TODOS os campos de texto (nome de cargos, descrições, habilidades, nomes de cursos, etc.)
+- NÃO traduza: nomes próprios de pessoas, nomes de empresas, nomes de ferramentas/tecnologias, URLs, emails, telefones
+- Mantenha a mesma estrutura JSON exata
+- Para títulos de cargos, use a forma mais comum e reconhecida no mercado internacional. Exemplos para inglês:
+  - "Líder de Desenvolvimento" → "Lead Developer" (NÃO "Development Lead")
+  - "Desenvolvedor Sênior" → "Senior Developer"
+  - "Analista de Sistemas" → "Systems Analyst"
+  - "Estagiário" → "Intern"
+  - Sempre coloque o nível (Senior, Junior, Lead) ANTES do cargo, como é padrão em inglês
+- Mantenha datas no formato original
+- Traduza os níveis de idioma para o equivalente (Básico->Basic, Intermediário->Intermediate, Avançado->Advanced, Fluente->Fluent, Nativo->Native) se traduzir para inglês, ou equivalentes na língua alvo
+- NÃO inclua campos extras como sectionHeaders — os cabeçalhos de seção são traduzidos automaticamente
+- Retorne APENAS o JSON traduzido, sem explicações`;
+}
+
+function buildAnalyzeCvPrompt(context: PromptContext, config: AreaConfig): string {
+  return `Você é um recrutador sênior experiente em ${config.label} no mercado brasileiro, com mais de 10 anos contratando profissionais.
+
+Analise o currículo abaixo como se fosse avaliar o candidato para uma vaga. Dê feedback honesto e construtivo.
+
+JSON do currículo:
+${context.cvJson}
+
+Forneça sua análise nos seguintes tópicos, usando esta estrutura EXATA (com os headers em ##):
+
+## Primeira Impressão
+Como recrutador, qual sua primeira impressão ao abrir este currículo? (2-3 frases)
+
+## Pontos Fortes
+Liste os 3-5 pontos mais fortes deste currículo, explicando por que cada um se destaca.
+
+## Pontos de Melhoria
+Liste os 3-5 pontos que precisam de melhoria, com sugestões concretas de como melhorar cada um.
+
+## Compatibilidade ATS
+Avalie de 1 a 10 a compatibilidade deste currículo com sistemas ATS. Explique o que está bom e o que pode melhorar para passar pelos filtros automáticos.
+
+## Adequação para ${config.label}
+O currículo está bem posicionado para vagas em ${config.label}? O que poderia ser ajustado para melhor aderência ao mercado?
+
+## Nota Geral
+Dê uma nota de 1 a 10 para o currículo como um todo e um resumo final em 2-3 frases.
+
+Regras:
+- Seja direto e prático, sem rodeios
+- Dê exemplos concretos quando sugerir melhorias
+- Considere o mercado brasileiro
+- Responda em português`;
 }
