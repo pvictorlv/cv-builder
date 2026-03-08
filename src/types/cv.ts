@@ -34,6 +34,7 @@ export const workExperienceItemSchema = z.object({
   type: workExperienceTypeSchema.default("fulltime"),
   role: z.string(),
   company: z.string(),
+  location: z.string().optional().default(""),
   startDate: z.string(),
   endDate: z.string(),
   current: z.boolean(),

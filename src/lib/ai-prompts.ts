@@ -230,6 +230,7 @@ Retorne APENAS um JSON válido (sem markdown, sem comentários, sem explicaçõe
         "type": "fulltime",
         "role": "",
         "company": "",
+        "location": "",
         "startDate": "YYYY-MM",
         "endDate": "YYYY-MM",
         "current": false,
@@ -277,6 +278,7 @@ Regras:
 - Se o candidato está no cargo atual, use current: true e endDate vazio
 - type pode ser: fulltime, freelance, sideproject, internship
 - Para sideproject, startDate e endDate podem ser vazios (projetos pessoais não precisam de datas)
+- location é opcional: cidade e país onde trabalhou (ex: "London, UK", "São Paulo, SP")
 - level de idioma deve ser exatamente um de: Básico, Intermediário, Avançado, Fluente, Nativo
 - Não invente informações que não existem no texto
 - Retorne APENAS o JSON, sem nenhum texto adicional`;
@@ -294,9 +296,15 @@ Regras:
 - Traduza TODOS os campos de texto (nome de cargos, descrições, habilidades, nomes de cursos, etc.)
 - NÃO traduza: nomes próprios de pessoas, nomes de empresas, nomes de ferramentas/tecnologias, URLs, emails, telefones
 - Mantenha a mesma estrutura JSON exata
-- Adapte títulos de cargos para equivalentes reconhecidos no mercado internacional (ex: "Desenvolvedor Sênior" -> "Senior Developer")
+- Para títulos de cargos, use a forma mais comum e reconhecida no mercado internacional. Exemplos para inglês:
+  - "Líder de Desenvolvimento" → "Lead Developer" (NÃO "Development Lead")
+  - "Desenvolvedor Sênior" → "Senior Developer"
+  - "Analista de Sistemas" → "Systems Analyst"
+  - "Estagiário" → "Intern"
+  - Sempre coloque o nível (Senior, Junior, Lead) ANTES do cargo, como é padrão em inglês
 - Mantenha datas no formato original
 - Traduza os níveis de idioma para o equivalente (Básico->Basic, Intermediário->Intermediate, Avançado->Advanced, Fluente->Fluent, Nativo->Native) se traduzir para inglês, ou equivalentes na língua alvo
+- NÃO inclua campos extras como sectionHeaders — os cabeçalhos de seção são traduzidos automaticamente
 - Retorne APENAS o JSON traduzido, sem explicações`;
 }
 

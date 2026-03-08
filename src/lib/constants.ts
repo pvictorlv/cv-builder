@@ -15,6 +15,82 @@ export const SECTION_HEADERS = {
   languages: "IDIOMAS",
 } as const;
 
+export type SectionHeaders = Record<keyof typeof SECTION_HEADERS, string>;
+
+export interface LocaleStrings {
+  sectionHeaders: SectionHeaders;
+  months: string[];
+  current: string;
+}
+
+export const LOCALE_TRANSLATIONS: Record<string, LocaleStrings> = {
+  "inglês": {
+    sectionHeaders: {
+      professionalSummary: "PROFESSIONAL SUMMARY",
+      workExperience: "PROFESSIONAL EXPERIENCE",
+      projects: "PROJECTS",
+      education: "EDUCATION",
+      skills: "SKILLS",
+      certifications: "CERTIFICATIONS",
+      languages: "LANGUAGES",
+    },
+    months: ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"],
+    current: "Present",
+  },
+  "espanhol": {
+    sectionHeaders: {
+      professionalSummary: "RESUMEN PROFESIONAL",
+      workExperience: "EXPERIENCIA PROFESIONAL",
+      projects: "PROYECTOS",
+      education: "FORMACIÓN ACADÉMICA",
+      skills: "HABILIDADES",
+      certifications: "CERTIFICACIONES",
+      languages: "IDIOMAS",
+    },
+    months: ["Ene", "Feb", "Mar", "Abr", "May", "Jun", "Jul", "Ago", "Sep", "Oct", "Nov", "Dic"],
+    current: "Actual",
+  },
+  "francês": {
+    sectionHeaders: {
+      professionalSummary: "RÉSUMÉ PROFESSIONNEL",
+      workExperience: "EXPÉRIENCE PROFESSIONNELLE",
+      projects: "PROJETS",
+      education: "FORMATION",
+      skills: "COMPÉTENCES",
+      certifications: "CERTIFICATIONS",
+      languages: "LANGUES",
+    },
+    months: ["Jan", "Fév", "Mar", "Avr", "Mai", "Jun", "Jul", "Aoû", "Sep", "Oct", "Nov", "Déc"],
+    current: "Actuel",
+  },
+  "alemão": {
+    sectionHeaders: {
+      professionalSummary: "BERUFSPROFIL",
+      workExperience: "BERUFSERFAHRUNG",
+      projects: "PROJEKTE",
+      education: "AUSBILDUNG",
+      skills: "KENNTNISSE",
+      certifications: "ZERTIFIKATE",
+      languages: "SPRACHEN",
+    },
+    months: ["Jan", "Feb", "Mär", "Apr", "Mai", "Jun", "Jul", "Aug", "Sep", "Okt", "Nov", "Dez"],
+    current: "Aktuell",
+  },
+  "italiano": {
+    sectionHeaders: {
+      professionalSummary: "PROFILO PROFESSIONALE",
+      workExperience: "ESPERIENZA PROFESSIONALE",
+      projects: "PROGETTI",
+      education: "FORMAZIONE",
+      skills: "COMPETENZE",
+      certifications: "CERTIFICAZIONI",
+      languages: "LINGUE",
+    },
+    months: ["Gen", "Feb", "Mar", "Apr", "Mag", "Giu", "Lug", "Ago", "Set", "Ott", "Nov", "Dic"],
+    current: "Attuale",
+  },
+};
+
 export const WORK_TYPE_LABELS: Record<string, string> = {
   fulltime: "Tempo integral",
   freelance: "Freelance",

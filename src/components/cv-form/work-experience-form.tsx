@@ -32,6 +32,7 @@ export function WorkExperienceForm({
       type: "fulltime",
       role: "",
       company: "",
+      location: "",
       startDate: "",
       endDate: "",
       current: false,
@@ -120,6 +121,12 @@ export function WorkExperienceForm({
                   placeholder={fieldLabels.companyPlaceholder}
                   value={item.company}
                   onChange={(e) => onUpdate(item.id, { company: e.target.value })}
+                />
+                <Input
+                  label="Localização (opcional)"
+                  placeholder="London, UK"
+                  value={item.location ?? ""}
+                  onChange={(e) => onUpdate(item.id, { location: e.target.value })}
                 />
                 <Input
                   label="Data de início (opcional)"

@@ -1,6 +1,6 @@
 import { Document, Page, Text, View, Image, StyleSheet } from "@react-pdf/renderer";
 import { type CVData } from "@/types/cv";
-import { SECTION_HEADERS } from "@/lib/constants";
+import { SECTION_HEADERS, type SectionHeaders, type LocaleStrings } from "@/lib/constants";
 import { formatDate, formatDateRange, formatCompanyWithType } from "@/lib/utils";
 
 const SIDEBAR_COLOR = "#2D3748";
@@ -103,9 +103,12 @@ const styles = StyleSheet.create({
 
 interface TemplateElegantProps {
   data: CVData;
+  headers?: SectionHeaders;
+  locale?: LocaleStrings;
 }
 
-export function TemplateElegant({ data }: TemplateElegantProps) {
+export function TemplateElegant({ data, headers, locale }: TemplateElegantProps) {
+  const h = headers ?? locale?.sectionHeaders ?? SECTION_HEADERS;
   const { contactInfo, professionalSummary, workExperience, education, skills, certifications, languages } = data;
 
   const contactLines = [
@@ -150,7 +153,7 @@ export function TemplateElegant({ data }: TemplateElegantProps) {
           {/* Skills */}
           {skills.items.length > 0 && (
             <View>
-              <Text style={styles.sidebarSectionHeader}>{SECTION_HEADERS.skills}</Text>
+              <Text style={styles.sidebarSectionHeader}>{h.skills}</Text>
               {skills.items.map((skill, i) => (
                 <Text key={i} style={styles.sidebarSkillItem}>{skill}</Text>
               ))}
@@ -160,7 +163,7 @@ export function TemplateElegant({ data }: TemplateElegantProps) {
           {/* Languages */}
           {languages.items.length > 0 && (
             <View>
-              <Text style={styles.sidebarSectionHeader}>{SECTION_HEADERS.languages}</Text>
+              <Text style={styles.sidebarSectionHeader}>{h.languages}</Text>
               {languages.items.map((item) => (
                 <View key={item.id} style={styles.sidebarLangRow}>
                   <Text style={styles.sidebarText}>{item.language}</Text>
@@ -173,7 +176,7 @@ export function TemplateElegant({ data }: TemplateElegantProps) {
           {/* Certifications */}
           {certifications.items.length > 0 && (
             <View>
-              <Text style={styles.sidebarSectionHeader}>{SECTION_HEADERS.certifications}</Text>
+              <Text style={styles.sidebarSectionHeader}>{h.certifications}</Text>
               {certifications.items.map((item) => (
                 <View key={item.id} style={{ marginBottom: 4 }}>
                   <Text style={{ ...styles.sidebarText, fontFamily: "Helvetica-Bold" }}>
@@ -183,7 +186,7 @@ export function TemplateElegant({ data }: TemplateElegantProps) {
                     <Text style={styles.sidebarText}>{item.issuer}</Text>
                   )}
                   {item.date && (
-                    <Text style={styles.sidebarText}>{formatDate(item.date)}</Text>
+                    <Text style={styles.sidebarText}>{formatDate(item.date, locale?.months)}</Text>
                   )}
                 </View>
               ))}
@@ -196,7 +199,7 @@ export function TemplateElegant({ data }: TemplateElegantProps) {
           {/* Summary */}
           {professionalSummary.summary && (
             <View>
-              <Text style={styles.mainSectionHeader}>{SECTION_HEADERS.professionalSummary}</Text>
+              <Text style={styles.mainSectionHeader}>{h.professionalSummary}</Text>
               <Text style={styles.text}>{professionalSummary.summary}</Text>
             </View>
           )}
@@ -204,17 +207,17 @@ export function TemplateElegant({ data }: TemplateElegantProps) {
           {/* Professional Experience */}
           {workExperience.items.filter((i) => i.startDate || i.endDate || i.current).length > 0 && (
             <View>
-              <Text style={styles.mainSectionHeader}>{SECTION_HEADERS.workExperience}</Text>
+              <Text style={styles.mainSectionHeader}>{h.workExperience}</Text>
               {workExperience.items.filter((i) => i.startDate || i.endDate || i.current).map((item) => (
                 <View key={item.id} style={{ marginBottom: 8 }}>
                   <View style={styles.itemHeader}>
                     <Text style={styles.bold}>{item.role}</Text>
                     <Text style={styles.italic}>
-                      {formatDateRange(item.startDate, item.endDate, item.current)}
+                      {formatDateRange(item.startDate, item.endDate, item.current, locale)}
                     </Text>
                   </View>
                   {(item.company || (item.type && item.type !== "fulltime")) && (
-                    <Text style={styles.italic}>{formatCompanyWithType(item.company, item.type ?? "fulltime")}</Text>
+                    <Text style={styles.italic}>{formatCompanyWithType(item.company, item.type ?? "fulltime", item.location)}</Text>
                   )}
                   {item.description &&
                     item.description.split("\n").filter(Boolean).map((line, i) => (
@@ -229,13 +232,13 @@ export function TemplateElegant({ data }: TemplateElegantProps) {
 
           {/* Projects */}
           {workExperience.items.filter((i) => !i.startDate && !i.endDate && !i.current).length > 0 && (
-            <View>
-              <Text style={styles.mainSectionHeader}>{SECTION_HEADERS.projects}</Text>
+            <View wrap={false}>
+              <Text style={styles.mainSectionHeader}>{h.projects}</Text>
               {workExperience.items.filter((i) => !i.startDate && !i.endDate && !i.current).map((item) => (
                 <View key={item.id} style={{ marginBottom: 8 }}>
                   <Text style={styles.bold}>{item.role}</Text>
-                  {item.company && (
-                    <Text style={styles.italic}>{item.company}</Text>
+                  {(item.company || item.location) && (
+                    <Text style={styles.italic}>{[item.company, item.location].filter(Boolean).join(" · ")}</Text>
                   )}
                   {item.description &&
                     item.description.split("\n").filter(Boolean).map((line, i) => (
@@ -251,13 +254,13 @@ export function TemplateElegant({ data }: TemplateElegantProps) {
           {/* Education */}
           {education.items.length > 0 && (
             <View>
-              <Text style={styles.mainSectionHeader}>{SECTION_HEADERS.education}</Text>
+              <Text style={styles.mainSectionHeader}>{h.education}</Text>
               {education.items.map((item) => (
                 <View key={item.id} style={{ marginBottom: 6 }}>
                   <View style={styles.itemHeader}>
                     <Text style={styles.bold}>{item.course}</Text>
                     <Text style={styles.italic}>
-                      {formatDateRange(item.startDate, item.endDate, item.current)}
+                      {formatDateRange(item.startDate, item.endDate, item.current, locale)}
                     </Text>
                   </View>
                   {item.institution && (

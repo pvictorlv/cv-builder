@@ -1,6 +1,6 @@
 import { Document, Page, Text, View, Image, StyleSheet } from "@react-pdf/renderer";
 import { type CVData } from "@/types/cv";
-import { SECTION_HEADERS } from "@/lib/constants";
+import { SECTION_HEADERS, type SectionHeaders, type LocaleStrings } from "@/lib/constants";
 import { formatDate, formatDateRange, formatCompanyWithType } from "@/lib/utils";
 
 const ACCENT = "#059669";
@@ -105,9 +105,12 @@ const styles = StyleSheet.create({
 
 interface TemplateExecutiveProps {
   data: CVData;
+  headers?: SectionHeaders;
+  locale?: LocaleStrings;
 }
 
-export function TemplateExecutive({ data }: TemplateExecutiveProps) {
+export function TemplateExecutive({ data, headers, locale }: TemplateExecutiveProps) {
+  const h = headers ?? locale?.sectionHeaders ?? SECTION_HEADERS;
   const { contactInfo, professionalSummary, workExperience, education, skills, certifications, languages } = data;
 
   const contactParts = [
@@ -176,17 +179,17 @@ export function TemplateExecutive({ data }: TemplateExecutiveProps) {
               {/* Professional Experience */}
               {workExperience.items.filter((i) => i.startDate || i.endDate || i.current).length > 0 && (
                 <View>
-                  <Text style={styles.sectionHeader}>{SECTION_HEADERS.workExperience}</Text>
+                  <Text style={styles.sectionHeader}>{h.workExperience}</Text>
                   {workExperience.items.filter((i) => i.startDate || i.endDate || i.current).map((item) => (
                     <View key={item.id} style={{ marginBottom: 8 }}>
                       <View style={styles.itemHeader}>
                         <Text style={styles.bold}>{item.role}</Text>
                         <Text style={styles.italic}>
-                          {formatDateRange(item.startDate, item.endDate, item.current)}
+                          {formatDateRange(item.startDate, item.endDate, item.current, locale)}
                         </Text>
                       </View>
                       {(item.company || (item.type && item.type !== "fulltime")) && (
-                        <Text style={styles.italic}>{formatCompanyWithType(item.company, item.type ?? "fulltime")}</Text>
+                        <Text style={styles.italic}>{formatCompanyWithType(item.company, item.type ?? "fulltime", item.location)}</Text>
                       )}
                       {item.description &&
                         item.description.split("\n").filter(Boolean).map((line, i) => (
@@ -201,13 +204,13 @@ export function TemplateExecutive({ data }: TemplateExecutiveProps) {
 
               {/* Projects */}
               {workExperience.items.filter((i) => !i.startDate && !i.endDate && !i.current).length > 0 && (
-                <View>
-                  <Text style={styles.sectionHeader}>{SECTION_HEADERS.projects}</Text>
+                <View wrap={false}>
+                  <Text style={styles.sectionHeader}>{h.projects}</Text>
                   {workExperience.items.filter((i) => !i.startDate && !i.endDate && !i.current).map((item) => (
                     <View key={item.id} style={{ marginBottom: 8 }}>
                       <Text style={styles.bold}>{item.role}</Text>
-                      {item.company && (
-                        <Text style={styles.italic}>{item.company}</Text>
+                      {(item.company || item.location) && (
+                        <Text style={styles.italic}>{[item.company, item.location].filter(Boolean).join(" · ")}</Text>
                       )}
                       {item.description &&
                         item.description.split("\n").filter(Boolean).map((line, i) => (
@@ -223,13 +226,13 @@ export function TemplateExecutive({ data }: TemplateExecutiveProps) {
               {/* Education */}
               {education.items.length > 0 && (
                 <View>
-                  <Text style={styles.sectionHeader}>{SECTION_HEADERS.education}</Text>
+                  <Text style={styles.sectionHeader}>{h.education}</Text>
                   {education.items.map((item) => (
                     <View key={item.id} style={{ marginBottom: 6 }}>
                       <View style={styles.itemHeader}>
                         <Text style={styles.bold}>{item.course}</Text>
                         <Text style={styles.italic}>
-                          {formatDateRange(item.startDate, item.endDate, item.current)}
+                          {formatDateRange(item.startDate, item.endDate, item.current, locale)}
                         </Text>
                       </View>
                       {item.institution && (
@@ -246,14 +249,14 @@ export function TemplateExecutive({ data }: TemplateExecutiveProps) {
               <View style={styles.columnRight}>
                 {skills.items.length > 0 && (
                   <View>
-                    <Text style={styles.sectionHeader}>{SECTION_HEADERS.skills}</Text>
+                    <Text style={styles.sectionHeader}>{h.skills}</Text>
                     <Text style={styles.skillsText}>{skills.items.join(", ")}</Text>
                   </View>
                 )}
 
                 {languages.items.length > 0 && (
                   <View>
-                    <Text style={styles.sectionHeader}>{SECTION_HEADERS.languages}</Text>
+                    <Text style={styles.sectionHeader}>{h.languages}</Text>
                     {languages.items.map((item) => (
                       <View key={item.id} style={styles.langRow}>
                         <Text style={styles.text}>{item.language}</Text>
@@ -265,13 +268,13 @@ export function TemplateExecutive({ data }: TemplateExecutiveProps) {
 
                 {certifications.items.length > 0 && (
                   <View>
-                    <Text style={styles.sectionHeader}>{SECTION_HEADERS.certifications}</Text>
+                    <Text style={styles.sectionHeader}>{h.certifications}</Text>
                     {certifications.items.map((item) => (
                       <View key={item.id} style={styles.certItem}>
                         <Text style={styles.text}>
                           <Text style={styles.bold}>{item.name}</Text>
                           {item.issuer ? ` – ${item.issuer}` : ""}
-                          {item.date ? ` (${formatDate(item.date)})` : ""}
+                          {item.date ? ` (${formatDate(item.date, locale?.months)})` : ""}
                         </Text>
                       </View>
                     ))}

@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Select } from "@/components/ui/select";
 import { useAISuggestion } from "@/hooks/use-ai-suggestion";
 import { type CVData, type TemplateName } from "@/types/cv";
+import { LOCALE_TRANSLATIONS } from "@/lib/constants";
 import { getTemplateComponent } from "./templates/get-template";
 
 const BlobProvider = dynamic(
@@ -85,6 +86,7 @@ export function TranslatedExportButton({ data, template }: TranslatedExportButto
               id: data.workExperience.items[i]?.id ?? uuid(),
               role: item.role ?? "",
               company: item.company ?? "",
+              location: item.location ?? data.workExperience.items[i]?.location ?? "",
               description: item.description ?? "",
               type: item.type ?? data.workExperience.items[i]?.type ?? "fulltime",
               startDate: item.startDate ?? data.workExperience.items[i]?.startDate ?? "",
@@ -179,7 +181,10 @@ export function TranslatedExportButton({ data, template }: TranslatedExportButto
       {error && <p className="text-xs text-destructive">{error}</p>}
 
       {translatedData && (
-        <BlobProvider document={getTemplateComponent(template, translatedData)}>
+        <BlobProvider document={getTemplateComponent(template, translatedData, {
+          headers: LOCALE_TRANSLATIONS[language]?.sectionHeaders,
+          locale: LOCALE_TRANSLATIONS[language],
+        })}>
           {({ url, loading: pdfLoading }) => (
             <Button
               variant="primary"
