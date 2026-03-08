@@ -105,6 +105,9 @@ Regras:
 - Priorize: competências dominadas, metodologias, resultados mensuráveis, senioridade
 - Use verbos de ação e linguagem direta e profissional
 - Mantenha primeira pessoa implícita (sem "eu")
+- Priorize informações que já existem no texto original. NÃO invente ferramentas ou experiências que não estejam no texto
+- Se o texto não menciona métricas, você pode sugerir métricas realistas e conservadoras (ex: "redução de 15%", "mais de 10 clientes") para dar impacto, mas sem exageros nem números grandiosos
+- Reorganize e melhore a redação do que já existe, adicionando o mínimo necessário
 - Evite clichês e termos vagos: "apaixonado", "proativo", "dinâmico", "busco desafios", "jogador de equipe", "rápido aprendizado", "multitarefas", "perfeccionista"
 - Use apenas texto plano, sem caracteres especiais ou decorativos (★, •, →, ■, |)
 - Máximo de 500 caracteres
@@ -164,9 +167,12 @@ ${rules}
 Métricas típicas da área (${config.label}): ${config.bulletMetrics}
 
 Regras gerais:
+- NÃO adicione ferramentas, tecnologias ou metodologias que não foram mencionadas no original
+- Se os bullets não mencionam métricas, você pode sugerir métricas realistas e conservadoras para dar impacto (ex: "redução de 20%", "atendimento de 50+ clientes"), mas sem exageros
+- Melhore a redação, estrutura e clareza do que já existe, adicionando o mínimo necessário
 - Mantenha EXATAMENTE a mesma quantidade de bullets da entrada
 - Cada bullet deve ter idealmente até 200 caracteres (recrutadores escaneiam rapidamente e ATS pode truncar linhas longas)
-- Use nomes oficiais e completos de ferramentas e metodologias
+- Use nomes oficiais e completos de ferramentas e metodologias mencionadas
 - Use apenas texto plano, sem caracteres especiais ou decorativos (★, •, →, ■, |)
 - Um bullet por linha, sem marcadores, prefixos ou numeração
 - Responda APENAS com os bullets reescritos, um por linha, sem explicações ou comentários
@@ -191,7 +197,8 @@ Regras:
 - Use o nome oficial e mais reconhecido de cada ferramenta/metodologia
 - Sugira skills no mesmo nível de especificidade das existentes
 - As sugestões devem ser coerentes com a área de ${config.label} — não sugira competências desconexas
-- Não repita nenhuma skill já listada
+- Não repita nenhuma skill já listada (verifique variações como "JS"/"JavaScript", "TS"/"TypeScript")
+- Sugira apenas skills que façam sentido com o perfil do candidato baseado nas skills existentes — não sugira skills aleatórias ou genéricas
 - Responda APENAS com a lista de skills, uma por linha, sem explicações, numeração, categorização ou prefixos
 
 Skills atuais: ${context.currentSkills?.join(", ") || "nenhuma"}`;
