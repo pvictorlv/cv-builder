@@ -13,7 +13,7 @@ PDF resume builder optimized for recruitment platforms, LinkedIn, with AI-powere
 
 ## Requirements
 
-- Node.js 18+
+- Node.js 20.16+
 - OpenRouter API key (optional, only for AI features)
 
 ## Running locally
